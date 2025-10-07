@@ -9,10 +9,13 @@ class KategoriController extends Controller
 {
     // Menampilkan daftar semua kategori
     public function index()
-    {
-        $kategori = Kategori::all();
-        return view('kategori.index', compact('kategori'));
-    }
+{
+    // Ambil semua data kategori dari database
+    $kategori = Kategori::all();
+
+    // Kirim data ke view
+    return view('kategori.index', compact('kategori'));
+}
 
     // Menampilkan formulir untuk membuat kategori baru
     public function create()

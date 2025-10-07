@@ -1,9 +1,7 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -15,7 +13,7 @@ class AuthController extends Controller
 
     public function signup(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'name'     => 'required|min:3|max:50',
             'email'    => ['required', 'email'],
             'password' => [
@@ -27,14 +25,14 @@ class AuthController extends Controller
                 'regex:/[0-9]/',
             ],
         ], [
-            'name.required' => 'Kolom nama wajib diisi.',
-            'name.min' => 'Nama minimal 3 karakter.',
-            'email.required' => 'Alamat email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'name.required'     => 'Kolom nama wajib diisi.',
+            'name.min'          => 'Nama minimal 3 karakter.',
+            'email.required'    => 'Alamat email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
 
-            'password.min' => 'Kata sandi harus minimal 8 karakter.',
+            'password.min'      => 'Kata sandi harus minimal 8 karakter.',
             'password.required' => 'Kata sandi wajib diisi.',
-            'password.regex' => 'Kata sandi harus mengandung kombinasi huruf besar, huruf kecil, dan angka.',
+            'password.regex'    => 'Kata sandi harus mengandung kombinasi huruf besar, huruf kecil, dan angka.',
         ]);
         $pageData['name']     = $request->name;
         $pageData['email']    = $request->email;
@@ -55,30 +53,30 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // 1. Validasi Input
+
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ], [
-            // Pesan error custom dalam Bahasa Indonesia
-            'email.required' => 'Alamat email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'email.required'    => 'Alamat email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
             'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
-        // 2. Coba Proses Otentikasi
-        if (Auth::attempt($credentials)) {
-            // Regenerasi session untuk mencegah session fixation
+        $is_valid_input = ! empty($credentials['email']) && ! empty($credentials['password']);
+
+        if ($is_valid_input) {
             $request->session()->regenerate();
-
-            // Redirect ke halaman dashboard atau home setelah berhasil login
-            return redirect()->intended('/home')->with('success', 'Selamat datang kembali!');
+            $email = strtolower($credentials['email']);
+            if ($email === 'admin@minimarket.com') {
+                return redirect()->route('dashboard.owner')->with('success', 'Selamat datang, Owner!');
+            } elseif ($email === 'kasir@minimarket.com') {
+                return redirect()->route('dashboard.staff')->with('success', 'Selamat datang, Staff Kasir!');
+            } elseif ($email === 'pelanggan@minimarket.com') {
+                return redirect()->route('pelanggan.dashboard')->with('success', 'Selamat berbelanja!');
+            } else {
+                return redirect()->route('home')->with('success', 'Selamat datang kembali!');
+            }
         }
-
-        // 3. Jika Otentikasi Gagal
-        // Kembali ke halaman login dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau kata sandi yang Anda masukkan salah.',
-        ])->onlyInput('email');
     }
 }
