@@ -55,30 +55,29 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // 1. Validasi Input
-        $credentials = $request->validate([
+
+      $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ], [
-            // Pesan error custom dalam Bahasa Indonesia
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
-        // 2. Coba Proses Otentikasi
-        if (Auth::attempt($credentials)) {
-            // Regenerasi session untuk mencegah session fixation
+        $is_valid_input = !empty($credentials['email']) && !empty($credentials['password']);
+
+        if ($is_valid_input) {
             $request->session()->regenerate();
-
-            // Redirect ke halaman dashboard atau home setelah berhasil login
-            return redirect()->intended('/home')->with('success', 'Selamat datang kembali!');
+            $email = strtolower($credentials['email']);
+            if ($email === 'admin@minimarket.com') {
+                return redirect()->route('dashboard.owner')->with('success', 'Selamat datang, Owner!');
+            } elseif ($email === 'kasir@minimarket.com') {
+                return redirect()->route('dashboard.staff')->with('success', 'Selamat datang, Staff Kasir!');
+            } else {
+                return redirect()->route('home')->with('success', 'Selamat datang kembali!');
+            }
         }
-
-        // 3. Jika Otentikasi Gagal
-        // Kembali ke halaman login dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau kata sandi yang Anda masukkan salah.',
-        ])->onlyInput('email');
     }
 }
+
