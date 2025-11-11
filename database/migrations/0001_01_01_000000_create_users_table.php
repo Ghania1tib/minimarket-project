@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->id(); // Ini adalah user_id
+            $table->string('nama_lengkap', 100);
+            $table->string('email', 100)->unique();
+            $table->timestamp('email_verified_at')->nullable(); // Bawaan Laravel
             $table->string('password');
-            $table->rememberToken();
+            $table->enum('role', ['admin', 'owner', 'kasir', 'customer']);
+            $table->string('no_telepon', 20)->nullable();
+            $table->text('alamat')->nullable();
+            $table->rememberToken(); // Bawaan Laravel
             $table->timestamps();
         });
 
