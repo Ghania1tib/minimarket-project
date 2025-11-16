@@ -1,109 +1,106 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua pengguna dari database.
-        $users = User::all();
-        // Tampilkan view 'users.index' dan kirim data pengguna.
-        return view('users.index', compact('users'));
+        $query = User::query();
+
+        // Search functionality
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('no_telepon', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->has('role') && $request->role != '') {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('user.index', compact('users'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('users.create');
+        return view('user.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'nama_lengkap' => 'required|min:3|max:50',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
+            'role' => 'required|in:owner,admin,kasir,customer',
+            'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string|max:255'
         ]);
 
-        // Buat pengguna baru di database.
         User::create([
-            'name' => $request->name,
+            'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'no_telepon' => $request->no_telepon,
+            'alamat' => $request->alamat
         ]);
 
-        // Arahkan kembali ke halaman index dengan pesan sukses.
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan!');
+        return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(User $user)
     {
-        $user = User::findOrFail($id);
-        // Tampilkan view 'users.show' dengan data pengguna.
-        return view('users.show', compact('user'));
+        return view('user.edit', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, User $user)
     {
-         $user = User::findOrFail($id);
-        // Tampilkan view 'users.edit' dengan data pengguna.
-        return view('users.edit', compact('user'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        // Cari pengguna yang akan diperbarui.
-        $user = User::findOrFail($id);
-
-        // Validasi data yang masuk.
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'nama_lengkap' => 'required|min:3|max:50',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:8|confirmed',
+            'role' => 'required|in:owner,admin,kasir,customer',
+            'no_telepon' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string|max:255'
         ]);
 
-        // Perbarui data pengguna.
-        $user->name = $request->name;
-        $user->email = $request->email;
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
-        }
-        $user->save();
+        $data = [
+            'nama_lengkap' => $request->nama_lengkap,
+            'email' => $request->email,
+            'role' => $request->role,
+            'no_telepon' => $request->no_telepon,
+            'alamat' => $request->alamat
+        ];
 
-        // Arahkan kembali dengan pesan sukses.
-        return redirect()->route('users.show', $user->id)->with('success', 'Data pengguna berhasil diperbarui!');
+        if ($request->password) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('user.index')->with('success', 'User berhasil diupdate!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        // Cari pengguna yang akan dihapus.
-        $user = User::findOrFail($id);
-        // Hapus pengguna tersebut.
-        $user->delete();
+        // Prevent deleting yourself
+        if ($user->id === auth()->id()) {
+            return redirect()->route('user.index')->with('error', 'Tidak dapat menghapus akun sendiri!');
+        }
 
-        // Arahkan kembali ke halaman index dengan pesan sukses.
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus!');
+        $user->delete();
+        return redirect()->route('user.index')->with('success', 'User berhasil dihapus!');
     }
 }

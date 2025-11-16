@@ -1,250 +1,431 @@
-
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>minimarket - Beranda</title>
-
+    <title>Minimarket - Belanja Kebutuhan Harian</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
+        /* ======================================================= */
+        /* VARIABEL WARNA TEMA */
+        /* ======================================================= */
+        :root {
+            --color-primary: #004f7c;
+            --color-accent: #ff6347;
+            --color-light: #ffb6c1;
+        }
+
         body {
             background: linear-gradient(to right, #ffdde1, #a1c4fd);
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            margin: 0;
         }
 
-        .navbar {
-            background-color: #ffb6c1;
-        }
-
-        .navbar .nav-link {
-            color: #003366 !important;
-            font-weight: 500;
+        .navbar-custom {
+            background-color: var(--color-light);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-brand {
             font-weight: bold;
-            color: #003366 !important;
+            color: var(--color-primary) !important;
         }
 
-        .container h1 {
-            color: #004f7c;
+        .navbar-nav .nav-link {
+            color: var(--color-primary) !important;
+        }
+
+        .content-container {
+            max-width: 1300px;
+            margin: 20px auto;
+            padding: 30px 15px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Banner Slider */
+        .carousel-item {
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .carousel-caption {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            background: none;
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            width: 50%;
+            color: white; /* Pastikan teks terlihat di atas warna solid */
+        }
+
+        .carousel-caption h2, .carousel-caption p {
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Flash Sale Styling */
+        .flash-sale-section {
+            background: linear-gradient(to right, #fff5f5, #ffe0e6);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid var(--color-accent);
+        }
+
+        .countdown-box {
+            background-color: var(--color-accent);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Card Produk Styling */
+        .product-card {
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image-container {
+            height: 180px;
+            background-color: white;
+            overflow: hidden;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .product-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .product-image-container img {
+            transform: scale(1.05);
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .badge-diskon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            font-size: 0.9rem;
+            padding: 5px 8px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .btn-primary-custom {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
             font-weight: bold;
         }
 
-        .card {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform .2s;
+        .btn-primary-custom:hover {
+            background-color: #003366;
+            border-color: #003366;
         }
 
-        .card:hover {
-            transform: scale(1.03);
+        .btn-accent {
+            background-color: var(--color-accent);
+            border-color: var(--color-accent);
+            color: white;
+            font-weight: bold;
         }
 
-        /* Tambahan styling untuk banner */
-        .hero-banner-card {
-            min-height: 180px;
+        .btn-accent:hover {
+            background-color: #e55337;
+            border-color: #e55337;
+            color: white;
+        }
+
+
+        .text-theme {
+            color: var(--color-primary) !important;
+        }
+
+        /* Kategori Card Styling */
+        .category-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.2s;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            background-color: #004f7c; /* Warna default jika gambar tidak ada */
+        }
+
+        .category-card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 4px 10px rgba(255, 99, 71, 0.2);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background-color: var(--color-light);
+            color: var(--color-primary);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 0 !important;
         }
     </style>
 </head>
 
 <body>
-    {{-- ======================================================= --}}
-    {{-- HEADER (NAVBAR) --}}
-    {{-- ======================================================= --}}
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-cart-shopping"></i> Supermarket 4</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+    <!-- NAV BAR -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top navbar-custom">
+        <div class="container-fluid content-container" style="background-color: transparent; box-shadow: none;">
+
+            <a class="navbar-brand" href="{{ route('home') }}"><i class="fas fa-shopping-basket me-2"></i> MINI<span
+                    style="color: var(--color-accent);">MARKET</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                {{-- Tambahkan Search Bar agar sesuai dengan standar supermarket web --}}
-                <form class="d-flex mx-auto w-50 my-2 my-lg-0" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Cari produk (mis. Minyak Goreng, Bawang)" aria-label="Search">
-                    <button class="btn btn-outline-dark" type="submit"><i class="bi bi-search"></i></button>
-                </form>
-
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-geo-alt"></i> Lokasi</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('kategori.index') }}"><i class="bi bi-tags"></i> Kategori</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-person-circle"></i> Akun</a></li>
-                    {{-- Ikon Keranjang Belanja --}}
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-cart"></i> Keranjang (0)</a></li>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" href="{{ route('home') }}">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('produk.index') }}">Semua Produk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('kategori.index') }}">Kategori</a>
+                    </li>
                 </ul>
+                <div class="d-flex align-items-center">
+                    <a href="/cart" class="btn btn-outline-dark me-3"><i class="fas fa-shopping-cart"></i> Keranjang
+                        (0)</a>
+                    @auth
+                        <a href="{{ route('pelanggan.dashboard') }}" class="btn btn-primary-custom btn-primary"><i
+                                class="fas fa-user-circle me-1"></i> Akun Saya</a>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-primary-custom btn-primary"><i
+                                class="fas fa-user"></i> Masuk</a>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>
+    <!-- END NAV BAR -->
 
-    <div class="container my-5">
+    <div class="content-container">
 
-        {{-- ======================================================= --}}
-        {{-- BAGIAN 1: HERO SECTION (PROMOSI UTAMA) --}}
-        {{-- Asumsi data $heroBanners dikirim dari Controller --}}
-        {{-- ======================================================= --}}
-        <h1 class="text-center mb-5">Belanja Segar & Hemat Setiap Hari</h1>
-        <div class="row g-4 mb-5">
-            @if(isset($heroBanners) && count($heroBanners) > 0)
-                @foreach ($heroBanners as $banner)
-                    <div class="col-md-6">
-                        <a href="{{ $banner['link'] }}" class="text-decoration-none">
-                            <div class="hero-banner-card shadow-lg" style="background-color: {{ $loop->index % 2 == 0 ? '#ff6347' : '#3cb371' }};">
-                                <h3>{{ $banner['title'] }}</h3>
-                                <p class="mb-2">{{ $banner['subtitle'] }}</p>
-                                <span class="btn btn-light btn-sm text-dark fw-bold">Belanja Sekarang <i class="bi bi-arrow-right"></i></span>
-                            </div>
-                        </a>
+        <!-- HERO CAROUSEL -->
+        <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @foreach ($heroBanners as $key => $banner)
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $key }}"
+                        class="{{ $key === 0 ? 'active' : '' }}" aria-current="{{ $key === 0 ? 'true' : 'false' }}"
+                        aria-label="Slide {{ $key + 1 }}"></button>
+                @endforeach
+            </div>
+            <div class="carousel-inner">
+                @foreach ($heroBanners as $key => $banner)
+                    <div class="carousel-item {{ $key === 0 ? 'active' : '' }}"
+                        style="height: 300px; background-color: {{ $banner['color'] }}; display: flex; align-items: center;">
+                        <div class="carousel-caption">
+                            <h2 class="display-5 fw-bold">{{ $banner['title'] }}</h2>
+                            <p class="lead">{{ $banner['subtitle'] }}</p>
+                            <a href="{{ $banner['link'] }}" class="btn btn-warning mt-3 fw-bold">Lihat Promo <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
                     </div>
                 @endforeach
-            @else
-                 <div class="col-12"><div class="alert alert-warning text-center">Tidak ada promosi utama saat ini.</div></div>
-            @endif
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
+        <!-- END HERO CAROUSEL -->
 
-        <hr class="my-5">
+        <!-- FLASH SALE SECTION -->
+        <div class="flash-sale-section mb-5 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0 text-danger"><i class="fas fa-bolt me-2"></i> FLASH SALE MENDADAK</h3>
+                <div class="d-flex align-items-center">
+                    <span class="text-dark me-2 fw-bold">Berakhir dalam:</span>
+                    <span class="countdown-box">{{ $countdownString }}</span>
+                </div>
+            </div>
 
-        {{-- ======================================================= --}}
-        {{-- BAGIAN 2: KATEGORI POPULER (NAVIGASI CEPAT) --}}
-        {{-- Asumsi data $popularCategories dikirim dari Controller --}}
-        {{-- ======================================================= --}}
-        <h2 class="text-center mb-4 text-primary">Jelajahi Kategori Favorit Anda</h2>
-        <div class="row text-center justify-content-center g-3 mb-5">
-            @if(isset($popularCategories) && count($popularCategories) > 0)
-                @foreach ($popularCategories as $category)
-                    <div class="col-md-2 col-4">
-                        <a href="{{ $category['link'] }}" class="card p-3 shadow-sm text-decoration-none h-100">
-                            <div style="font-size: 2rem;">{{ $category['icon'] }}</div>
-                            <p class="mt-2 mb-0 fw-bold text-dark">{{ $category['name'] }}</p>
-                        </a>
-                    </div>
-                @endforeach
-            @endif
-        </div>
-
-        <hr class="my-5">
-
-        {{-- ======================================================= --}}
-        {{-- BAGIAN 3: FLASH SALE (PENJUALAN TERBATAS) --}}
-        {{-- Asumsi data $flashSaleProducts dikirim dari Controller --}}
-        {{-- ======================================================= --}}
-    <h2 class="mb-4 text-danger text-center">
-    <i class="bi bi-lightning-fill"></i> FLASH SALE!
-    {{-- Tampilkan string hitung mundur dari Controller --}}
-    <small class="text-muted fs-6">
-        Berakhir dalam:
-        {{-- Jika waktu sudah berakhir, tampilkan pesan --}}
-        @if ($countdownString === '00:00:00')
-            SUDAH BERAKHIR!
-        @else
-            {{ $countdownString }}
-        @endif
-    </small>
-    </h2>
-<div class="row g-4 mb-5">
-            @if(isset($flashSaleProducts) && count($flashSaleProducts) > 0)
+            <div class="row g-3">
                 @foreach ($flashSaleProducts as $product)
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="card product-card text-center">
+                            <span class="badge-diskon badge text-white">
+                                -{{ $product['discount_rate'] }}%
+                            </span>
+
+                            <div class="product-image-container">
+                                <img src="{{ $product['img_url'] }}" alt="{{ $product['name'] }}" class="img-fluid">
+                            </div>
+
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block mb-1">{{ $product['category_name'] }}</small>
+                                    <h6 class="card-title fw-bold mb-1">{{ $product['name'] }}</h6>
+                                </div>
+                                <div>
+                                    <p class="old-price mb-0">Rp {{ number_format($product['price'], 0, ',', '.') }}</p>
+                                    <p class="card-text text-danger fw-bold fs-5">Rp
+                                        {{ number_format($product['discount_price'], 0, ',', '.') }}</p>
+                                    <a href="{{ $product['link'] }}" class="btn btn-accent btn-sm w-100 fw-bold">Beli
+                                        Sekarang <i class="fas fa-tag"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        <!-- END FLASH SALE SECTION -->
+
+        <!-- POPULAR CATEGORIES -->
+        <h3 class="mb-4 text-theme"><i class="fas fa-layer-group me-2"></i> Kategori Populer</h3>
+        <div class="row g-4 mb-5 text-center">
+            @if ($popularCategories->isEmpty())
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Belum ada kategori dengan produk.</h4>
+                </div>
+            @else
+                @foreach ($popularCategories as $category)
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <a href="{{ route('kategori.show', $category->id) }}"
+                            class="text-decoration-none d-block p-4 category-card shadow-sm">
+                            <div style="font-size: 2.5rem;" class="mb-2">
+                                @if ($category->icon_url)
+                                    <img src="{{ asset('storage/' . $category->icon_url) }}" alt="{{ $category->nama_kategori }}" style="width: 50px; height: 50px; object-fit: contain;">
+                                @else
+                                    <i class="fas fa-box text-theme"></i>
+                                @endif
+                            </div>
+                            <p class="fw-bold mb-0 text-dark">{{ $category->nama_kategori }}</p>
+                            <small class="text-muted">{{ $category->products_count }} produk</small>
+                        </a>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+        <!-- END POPULAR CATEGORIES -->
+
+        <!-- FEATURED PRODUCTS -->
+        <h3 class="mb-4 text-theme"><i class="fas fa-star me-2"></i> Produk Unggulan Minggu Ini</h3>
+        <div class="row g-4 mb-5">
+            @if ($produkUnggulan->isEmpty())
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Belum ada produk yang tersedia.</h4>
+                    <a href="{{ route('produk.create') }}" class="btn btn-primary-custom mt-3">Tambah Produk</a>
+                </div>
+            @else
+                @foreach ($produkUnggulan as $product)
                     <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card h-100">
-                            <img src="https://via.placeholder.com/300x200?text=Flash+Sale" class="card-img-top" alt="{{ $product['name'] }}">
-                            <div class="card-body text-center">
-                                <h5 class="card-title text-truncate">{{ $product['name'] }}</h5>
-                                <p class="text-danger fw-bold fs-5">Rp{{ number_format($product['discount_price'], 0, ',', '.') }}</p>
-                                <p class="text-muted mb-2"><s>Rp{{ number_format($product['price'], 0, ',', '.') }}</s></p>
-                                <span class="badge bg-danger mb-3">-{{ round((($product['price'] - $product['discount_price']) / $product['price']) * 100) }}%</span>
-                                <a href="#" class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-cart-plus"></i> Tambah</a>
+                        <div class="card product-card">
+                            <div class="product-image-container">
+                                <img src="{{ $product->full_gambar_url }}" alt="{{ $product->nama_produk }}"
+                                    class="img-fluid">
+                            </div>
+
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block mb-1">{{ $product->category->nama_kategori ?? 'Umum' }}</small>
+                                    <h6 class="card-title fw-bold">{{ $product->nama_produk }}</h6>
+                                </div>
+                                <div>
+                                    <p class="card-text text-theme fw-bold fs-5 mb-2">
+                                        {{ $product->harga_jual_formatted }}</p>
+                                    <a href="{{ route('produk.show', $product->id) }}"
+                                        class="btn btn-primary-custom btn-sm w-100"><i class="fas fa-plus me-1"></i> Lihat
+                                        Detail</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
-            @else
-                 <div class="col-12"><div class="alert alert-info text-center">Tidak ada produk Flash Sale saat ini.</div></div>
             @endif
         </div>
+        <!-- END FEATURED PRODUCTS -->
 
-        <hr class="my-5">
-
-        {{-- ======================================================= --}}
-        {{-- BAGIAN 4: PRODUK TERBARU (Sesuai dengan kode asli Anda) --}}
-        {{-- ======================================================= --}}
-        <h2 class="text-center mb-4 text-success"><i class="bi bi-box-seam"></i> Produk Terbaru Kami</h2>
-        <div class="row g-4">
-            @if(isset($produk) && count($produk) > 0)
-                @foreach ($produk as $item)
-                    <div class="col-md-4 col-lg-3 col-sm-6">
-                        <div class="card h-100">
-                            @if($item->gambar)
-                                <img src="{{ asset('storage/' . $item->gambar) }}" class="card-img-top" alt="{{ $item->nama }}" style="height: 150px; object-fit: cover;">
-                            @else
-                                <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="{{ $item->nama }}" style="height: 150px; object-fit: cover;">
-                            @endif
-                            <div class="card-body text-center">
-                                <h5 class="card-title text-truncate">{{ $item->nama }}</h5>
-                                <p class="card-text fw-bold">Rp {{ number_format($item->harga, 0, ',', '.') }}</p>
-                                <p class="text-muted small">{{ $item->kategori->nama ?? 'Tanpa Kategori' }}</p>
-                                <a href="{{ route('produk.show', $item->id) }}" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-eye"></i> Detail
-                                </a>
-                                <a href="#" class="btn btn-success btn-sm"><i class="bi bi-cart-plus"></i> Beli</a>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="col-12"><div class="alert alert-info text-center">Tidak ada produk untuk ditampilkan saat ini.</div></div>
-            @endif
-        </div>
     </div>
 
-    {{-- ======================================================= --}}
-    {{-- FOOTER (Tambahan) --}}
-    {{-- ======================================================= --}}
-    <footer class="bg-light text-center text-lg-start mt-5">
+    <!-- FOOTER -->
+    <footer class="text-center text-lg-start mt-5"
+        style="background-color: var(--color-light); color: var(--color-primary);">
         <div class="container p-4">
             <div class="row">
                 <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-                    <h5 class="text-uppercase"><i class="fa-solid fa-cart-shopping"></i> Supermarket 4</h5>
-                    <p>
-                        Jaminan kesegaran produk dan pengiriman tepat waktu langsung ke pintu rumah Anda.
-                    </p>
+                    <h5 class="text-uppercase"><i class="fas fa-shopping-basket me-2"></i> Minimarket</h5>
+                    <p style="color: var(--color-primary);">Jaminan kesegaran produk dan pengiriman tepat waktu
+                        langsung ke pintu rumah Anda.</p>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
                     <h5 class="text-uppercase">Informasi</h5>
                     <ul class="list-unstyled mb-0">
-                        <li><a href="/about" class="text-dark text-decoration-none">About Us</a></li>
-                        <li><a href="/contact" class="text-dark text-decoration-none">Contact Us</a></li>
-                        <li><a href="/terms" class="text-dark text-decoration-none">Syarat & Ketentuan</a></li>
+                        <li><a href="{{ route('about') }}" class="text-dark text-decoration-none">Tentang Kami</a></li>
+                        <li><a href="{{ route('contact') }}" class="text-dark text-decoration-none">Hubungi Kami</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-dark text-decoration-none">Syarat & Ketentuan</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-uppercase">Bantuan</h5>
+                    <h5 class="text-uppercase">Akun Anda</h5>
                     <ul class="list-unstyled mb-0">
-                        <li><a href="#!" class="text-dark text-decoration-none">FAQ</a></li>
-                        <li><a href="#!" class="text-dark text-decoration-none">Layanan Pelanggan</a></li>
-                        <li><a href="#!" class="text-dark text-decoration-none">Cek Pesanan</a></li>
+                        @auth
+                        <li><a href="{{ route('pelanggan.profil') }}" class="text-dark text-decoration-none">Profil</a></li>
+                        <li><a href="{{ route('pelanggan.riwayat') }}" class="text-dark text-decoration-none">Riwayat Pesanan</a></li>
+                        @else
+                        <li><a href="{{ route('login') }}" class="text-dark text-decoration-none">Masuk</a></li>
+                        <li><a href="{{ route('signup') }}" class="text-dark text-decoration-none">Daftar</a></li>
+                        @endauth
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="text-center p-3" style="background-color: #ffb6c1;">
-            © 2024 Supermarket 4. All Rights Reserved.
+        <div class="text-center p-3" style="background-color: #ff91a4;">
+            &copy; 2024 Minimarket. All Rights Reserved.
         </div>
     </footer>
+    <!-- END FOOTER -->
+
 </body>
+
 </html>
