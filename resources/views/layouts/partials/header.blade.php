@@ -1,40 +1,83 @@
-<header class="p-3 mb-3 border-bottom" style="background-color: #FFEFF3;">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top navbar-custom">
     <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-                {{-- Ganti dengan logo Anda --}}
-                <h4 class="fw-bold" style="color: #E84F88;">Supermarket 4</h4>
-            </a>
-
-            <div class="mx-auto col-12 col-lg-6 mb-3 mb-lg-0">
-                {{-- FORM PENCARIAN --}}
-                <form action="{{ route('produk.search') }}" method="GET" role="search">
-                    <input type="search" name="keyword" class="form-control" placeholder="Cari produk (mis. Minyak Goreng, Bawang)" value="{{ request('keyword') }}">
-                </form>
-            </div>
+        <a class="navbar-brand" href="{{ route('home') }}">
+            <i class="fas fa-store me-2"></i> TOKO **SAUDARA 2**
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar"
+            aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="publicNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="{{ route('home') }}">Beranda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('produk.index') }}">Semua Produk</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('kategori.index') }}">Kategori</a>
+                </li>
+            </ul>
 
             <div class="d-flex align-items-center">
-                {{-- MENU TASKBAR --}}
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="#" class="nav-link px-2 link-secondary">📍 Lokasi</a></li>
-                    <li><a href="{{ route('kategori.index') }}" class="nav-link px-2 link-dark">🏷️ Kategori</a></li>
+                {{-- Form Pencarian --}}
+                <div class="me-3 d-none d-lg-block">
+                    <form action="{{ route('produk.search') }}" method="GET" role="search" class="d-flex">
+                        <input type="search" name="keyword" class="form-control form-control-sm" placeholder="Cari produk..." value="{{ request('keyword') }}" style="width: 250px;">
+                    </form>
+                </div>
 
-                    {{-- Logic untuk Akun (Login/Dashboard) --}}
-                    @auth
-                        {{-- Jika sudah login, arahkan ke dashboard pelanggan --}}
-                        <li><a href="{{ route('pelanggan.dashboard') }}" class="nav-link px-2 link-dark">👤 Akun</a></li>
-                    @else
-                        {{-- Jika belum login, arahkan ke halaman login --}}
-                        <li><a href="{{ route('login') }}" class="nav-link px-2 link-dark">👤 Akun</a></li>
-                    @endauth
+                {{-- Tombol Keranjang --}}
+                <a href="{{ route('cart.index') }}" class="btn btn-outline-dark me-3 position-relative" style="color: var(--color-primary); border-color: var(--color-secondary);">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill" id="cart-count-badge" style="background-color: var(--color-danger); font-size: 0.7em;">
+                        0
+                    </span>
+                </a>
 
-                    <li>
-                        <a href="#" class="nav-link px-2 link-dark">
-                            🛒 Keranjang (0) {{-- Angka 0 bisa dibuat dinamis --}}
-                        </a>
-                    </li>
-                </ul>
+                {{-- Tombol Akun --}}
+                @auth
+                    @php
+                        $userRole = Auth::user()->role;
+                    @endphp
+                    <div class="dropdown">
+                        <button class="btn btn-primary-custom dropdown-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ Auth::user()->nama_lengkap ?? Auth::user()->name }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                            @if ($userRole === 'pelanggan')
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.dashboard') }}"><i class="fas fa-tachometer-alt me-2 text-theme-primary"></i>Dashboard Pelanggan</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.profil') }}"><i class="fas fa-user-edit me-2 text-theme-primary"></i>Profil Saya</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pelanggan.pesanan') }}"><i class="fas fa-history me-2 text-theme-primary"></i>Riwayat Pesanan</a></li>
+                            @elseif ($userRole === 'admin' || $userRole === 'owner')
+                                <li><a class="dropdown-item" href="{{ route('owner.dashboard') }}"><i class="fas fa-user-shield me-2 text-theme-primary"></i>Dashboard Admin/Owner</a></li>
+                                <li><a class="dropdown-item" href="{{ route('produk.index') }}"><i class="fas fa-boxes me-2 text-theme-primary"></i>Manajemen Produk</a></li>
+                            @elseif ($userRole === 'kasir' || $userRole === 'staff')
+                                <li><a class="dropdown-item" href="{{ route('dashboard.staff') }}"><i class="fas fa-cash-register me-2 text-theme-primary"></i>Dashboard Staff/Kasir</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pos.new') }}"><i class="fas fa-barcode me-2 text-theme-primary"></i>Mulai Transaksi (POS)</a></li>
+                            @endif
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-primary-custom btn-sm">
+                        <i class="fas fa-sign-in-alt me-1"></i> Masuk
+                    </a>
+                @endauth
             </div>
         </div>
     </div>
-</header>
+</nav>
+
+<style>
+    .cart-badge {
+        display: none; /* Disembunyikan secara default, akan ditampilkan oleh JS jika count > 0 */
+    }
+</style>

@@ -1,125 +1,69 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Kategori - Minimarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(to right, #ffdde1, #a1c4fd);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar {
-            background-color: #004f7c;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            margin-bottom: 20px;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .category-icon {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .btn-group .btn {
-            margin: 0 2px;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard.staff') }}">
-                <i class="fas fa-cash-register"></i> Kasir Minimarket
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('dashboard.staff') }}">Dashboard</a>
-                <a class="nav-link" href="{{ route('produk.index') }}">Produk</a>
-                <a class="nav-link active" href="{{ route('kategori.index') }}">Kategori</a>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+@extends('layouts.app')
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-tags me-2"></i> Manajemen Kategori</h1>
-            <a href="{{ route('kategori.create') }}" class="btn btn-primary">
+@section('title', 'Manajemen Kategori')
+
+@section('navbar')
+    @include('layouts.partials.header')
+@endsection
+
+@section('content')
+    <div class="content-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="text-theme-primary" style="font-size: 1.75rem;"><i class="fas fa-tags me-2"></i> Manajemen Kategori</h1>
+            <a href="{{ route('kategori.create') }}" class="btn btn-primary-custom btn-md">
                 <i class="fas fa-plus me-2"></i>Tambah Kategori
             </a>
         </div>
+        <hr class="mt-0 mb-4">
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+        <div class="row g-3">
+            @if(isset($kategories) && $kategories->isEmpty())
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-tags fa-4x text-secondary mb-3"></i>
+                    <h4>Belum ada kategori</h4>
+                    <p class="text-muted">Mulai dengan menambahkan kategori pertama Anda.</p>
+                    <a href="{{ route('kategori.create') }}" class="btn btn-primary-custom mt-2">
+                        <i class="fas fa-plus me-2"></i>Tambah Kategori Pertama
+                    </a>
+                </div>
+            @else
+                @foreach($kategories as $kategori)
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="card h-100 p-3 text-center bg-theme-light shadow-sm" style="border-top: 4px solid var(--color-accent);">
+                            <div class="card-body p-3">
+                                <div class="mb-3">
+                                    {{-- Icon/Image Display --}}
+                                    @if ($kategori->icon_url && filter_var($kategori->icon_url, FILTER_VALIDATE_URL))
+                                        <img src="{{ $kategori->icon_url }}" alt="{{ $kategori->nama_kategori }}" class="rounded-3" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid var(--color-primary);">
+                                    @elseif(isset($kategori->icon_url))
+                                        <img src="{{ asset('storage/' . $kategori->icon_url) }}" alt="{{ $kategori->nama_kategori }}" class="rounded-3" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid var(--color-primary);">
+                                    @else
+                                        <i class="fas fa-layer-group fa-2x text-theme-primary"></i>
+                                    @endif
+                                </div>
+                                <h6 class="card-title text-theme-primary fw-bold">{{ $kategori->nama_kategori }}</h6>
+                                <p class="card-text text-muted small">
+                                    {{ $kategori->products_count ?? 0 }} produk
+                                </p>
 
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        <div class="row">
-            @foreach($kategories as $kategori)
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ $kategori->nama_kategori }}</h5>
-                            <p class="card-text text-muted">
-                                <small>{{ $kategori->products_count }} produk</small>
-                            </p>
-
-                            <div class="btn-group w-100">
-                                <a href="{{ route('kategori.show', $kategori->id) }}" class="btn btn-info btn-sm">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('kategori.edit', $kategori->id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Hapus kategori {{ $kategori->nama_kategori }}?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <div class="btn-group w-100 mt-3">
+                                    <a href="{{ route('kategori.edit', $kategori->id) }}" class="btn btn-primary-custom btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Hapus kategori {{ $kategori->nama_kategori }}?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            @endif
         </div>
-
-        @if($kategories->isEmpty())
-            <div class="text-center py-5">
-                <i class="fas fa-tags fa-4x text-muted mb-3"></i>
-                <h4>Belum ada kategori</h4>
-                <p class="text-muted">Mulai dengan menambahkan kategori pertama Anda.</p>
-                <a href="{{ route('kategori.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Tambah Kategori Pertama
-                </a>
-            </div>
-        @endif
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

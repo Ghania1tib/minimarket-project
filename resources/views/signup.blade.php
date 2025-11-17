@@ -1,122 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>minimarket - Daftar Akun</title>
-
+    <title>Toko Saudara 2 - Daftar Akun</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Gaya dasar (background gradient dan pemusatan) */
+        :root {
+            --color-primary: #5E548E; /* Dark Lilac */
+            --color-secondary: #9F86C0; /* Medium Lilac */
+            --color-accent: #E0B1CB; /* Nude Pink */
+            --color-danger: #E07A5F; /* Soft Coral */
+            --color-light: #F0E6EF; /* Very Light Lilac */
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+        }
         body {
-            background: linear-gradient(to right, #ffdde1, #a1c4fd);
+            background: var(--gradient-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 15px;
         }
-
-        /* Styling Form Card */
         .signup-card {
             max-width: 420px;
             width: 100%;
             padding: 25px;
             background-color: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            border-top: 4px solid #ffb6c1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-top: 5px solid var(--color-primary);
             animation: fadeIn 0.8s ease-out;
         }
-
-        /* Judul */
         .signup-card h5 {
-            color: #004f7c;
+            color: var(--color-primary);
             font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
         }
-
-        /* Styling Input Field */
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-            padding: 8px 12px;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: #ffb6c1;
-            box-shadow: 0 0 0 0.2rem rgba(255, 182, 193, 0.25);
-        }
-
-        /* Styling Label */
         .form-label {
             font-weight: 600;
             font-size: 0.9rem;
             margin-bottom: 6px;
-            color: #004f7c;
+            color: var(--color-primary);
         }
-
-        /* Styling Button */
-        .btn-primary {
-            background-color: #004f7c;
-            border-color: #004f7c;
+        .form-control:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 0.2rem rgba(160, 134, 192, 0.25);
+        }
+        .input-icon {
+            color: var(--color-accent);
+            width: 16px;
+        }
+        .btn-theme-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
             border-radius: 8px;
             padding: 10px;
             font-weight: 600;
             font-size: 0.95rem;
             transition: all 0.3s;
-            margin-top: 10px;
         }
-
-        .btn-primary:hover {
-            background-color: #003366;
-            border-color: #003366;
+        .btn-theme-primary:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
             transform: translateY(-1px);
         }
-
-        /* Styling Error Alert */
-        .alert-danger {
-            border-radius: 8px;
-            font-size: 0.85rem;
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-            padding: 10px 15px;
-            margin-bottom: 15px;
+        .login-link a {
+            color: var(--color-danger) !important;
+            text-decoration: none;
+            font-weight: 600;
         }
-
-        /* Help text untuk password */
-        .form-text {
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
-
-        /* Link untuk login */
-        .login-link {
-            font-size: 0.85rem;
-            margin-top: 15px;
-        }
-
-        /* Animasi */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-15px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Icon dalam input */
-        .input-icon {
-            color: #ffb6c1;
-            width: 16px;
         }
     </style>
 </head>
@@ -125,8 +87,8 @@
         <h5 class="text-uppercase">Daftar Akun Baru</h5>
 
         @if ($errors->any())
-            <div class="alert alert-danger" role="alert">
-                <ul class="mb-0 ps-3" style="font-size: 0.85rem;">
+            <div class="alert alert-danger" role="alert" style="border-radius: 8px; font-size: 0.85rem;">
+                <ul class="mb-0 ps-3">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -134,7 +96,8 @@
             </div>
         @endif
 
-        <form action="{{ route('signup') }}" method="POST">
+        {{-- Route dikoreksi ke submit.signup sesuai convention Laravel --}}
+        <form action="{{ route('submit.signup') }}" method="POST">
             @csrf
 
             <div class="mb-2">
@@ -203,15 +166,15 @@
             </div>
 
             <div class="d-grid mt-3">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-theme-primary">
                     <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
                 </button>
             </div>
         </form>
 
-        <p class="text-center login-link mb-0">
+        <p class="text-center login-link mb-0 mt-3" style="font-size: 0.85rem;">
             Sudah punya akun?
-            <a href="{{ route('login') }}" style="color: #ff6b8b; text-decoration: none; font-weight: 600;">
+            <a href="{{ route('login') }}">
                 Masuk di sini
             </a>
         </p>

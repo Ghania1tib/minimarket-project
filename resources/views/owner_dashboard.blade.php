@@ -1,123 +1,82 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin/Owner - Minimarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(to right, #a1c4fd, #ffdde1);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar {
-            background-color: #004f7c;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-3px);
-        }
-        .quick-action-link {
-            text-decoration: none;
-            color: inherit;
-        }
-        .quick-action-link:hover .card {
-            background-color: #f0f8ff;
-            border-color: #004f7c;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+@extends('layouts.app')
+
+@section('title', 'Dashboard Admin/Owner')
+
+@section('navbar')
+    {{-- Navbar Khusus Admin/Owner menggunakan CSS dari app.blade.php --}}
+    <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="{{ route('owner.dashboard') }}">
-                <i class="fas fa-chart-line"></i> Dashboard Admin/Owner
+                <i class="fas fa-chart-line me-2"></i>Dashboard **ADMIN/OWNER**
             </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                <span class="nav-link text-theme-primary me-3 d-none d-md-block small">
                     Halo, <strong>{{ Auth::user()->nama_lengkap }} ({{ Auth::user()->role }})</strong>
                 </span>
-                <a class="btn btn-outline-light btn-sm me-2" href="{{ route('home') }}">
+                <a class="btn btn-outline-dark btn-sm me-2" style="border-color: var(--color-primary); color: var(--color-primary);" href="{{ route('home') }}">
                     <i class="fas fa-home"></i> Landing Page
                 </a>
                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm">
+                    <button type="submit" class="btn btn-danger btn-sm">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
             </div>
         </div>
     </nav>
+@endsection
 
-    <div class="container mt-4">
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+@section('content')
+    <div class="content-container">
 
-        <h1 class="mb-4 text-primary"><i class="fas fa-tachometer-alt me-2"></i> Dashboard Admin/Owner</h1>
-        <hr>
+        <h1 class="mb-3 text-theme-primary"><i class="fas fa-tachometer-alt me-2"></i> Dashboard Admin/Owner</h1>
+        <hr class="mb-4">
 
-        <!-- QUICK ACTIONS / DATA MASTER -->
-        <h3 class="mt-5 mb-3 text-secondary"><i class="fas fa-database me-2"></i> Manajemen Data Master</h3>
-        <div class="row g-4">
-            <div class="col-md-3">
-                <a href="{{ route('produk.index') }}" class="quick-action-link">
-                    <div class="card text-center p-3 border-primary">
-                        <i class="fas fa-boxes fa-3x text-primary mb-2"></i>
-                        <h5 class="card-title">Produk (CRUD)</h5>
+        <h3 class="mb-3 text-theme-primary fw-bold" style="font-size: 1.4rem;"><i class="fas fa-database me-2"></i> Manajemen Data Master</h3>
+        <div class="row g-3">
+            @php
+                $masterDataLinks = [
+                    ['route' => 'produk.index', 'icon' => 'fas fa-boxes', 'title' => 'Produk (CRUD)', 'color' => 'var(--color-primary)'],
+                    ['route' => 'kategori.index', 'icon' => 'fas fa-tags', 'title' => 'Kategori (CRUD)', 'color' => 'var(--color-secondary)'],
+                    ['route' => 'user.index', 'icon' => 'fas fa-users-cog', 'title' => 'Akun Pengguna (CRUD)', 'color' => 'var(--color-success)'],
+                    ['route' => 'promo.index', 'icon' => 'fas fa-percent', 'title' => 'Promo (CRUD)', 'color' => 'var(--color-danger)'],
+                ];
+            @endphp
+
+            @foreach ($masterDataLinks as $link)
+            <div class="col-xl-3 col-md-6">
+                <a href="{{ route($link['route']) }}" class="text-decoration-none">
+                    <div class="card text-center p-3 h-100 bg-theme-light" style="border-top: 4px solid {{ $link['color'] }};">
+                        <i class="{{ $link['icon'] }} fa-2x mb-2" style="color: {{ $link['color'] }};"></i>
+                        <h5 class="card-title text-dark fw-bold" style="font-size: 1.1rem;">{{ $link['title'] }}</h5>
+                        <p class="small text-muted mb-0">Kelola data toko</p>
                     </div>
                 </a>
             </div>
-            <div class="col-md-3">
-                <a href="{{ route('kategori.index') }}" class="quick-action-link">
-                    <div class="card text-center p-3 border-info">
-                        <i class="fas fa-tags fa-3x text-info mb-2"></i>
-                        <h5 class="card-title">Kategori (CRUD)</h5>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('user.index') }}" class="quick-action-link">
-                    <div class="card text-center p-3 border-success">
-                        <i class="fas fa-users-cog fa-3x text-success mb-2"></i>
-                        <h5 class="card-title">Akun Pengguna (CRUD)</h5>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('diskon.management') }}" class="quick-action-link">
-                    <div class="card text-center p-3 border-warning">
-                        <i class="fas fa-percent fa-3x text-warning mb-2"></i>
-                        <h5 class="card-title">Promo (CRUD)</h5>
-                    </div>
-                </a>
-            </div>
+            @endforeach
         </div>
 
-        <!-- REPORTS -->
-        <h3 class="mt-5 mb-3 text-secondary"><i class="fas fa-chart-pie me-2"></i> Laporan & Analisis</h3>
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="card text-center p-3 border-danger">
-                    <i class="fas fa-file-invoice-dollar fa-3x text-danger mb-2"></i>
-                    <h5 class="card-title">Laporan Penjualan (R)</h5>
-                </div>
+        <h3 class="mt-4 mb-3 text-secondary text-theme-primary fw-bold" style="font-size: 1.4rem;"><i class="fas fa-chart-pie me-2"></i> Laporan & Analisis</h3>
+        <div class="row g-3">
+            <div class="col-xl-3 col-md-6">
+                <a href="#" class="text-decoration-none">
+                    <div class="card text-center p-3 h-100 bg-theme-light" style="border-top: 4px solid var(--color-danger);">
+                        <i class="fas fa-file-invoice-dollar fa-2x mb-2" style="color: var(--color-danger);"></i>
+                        <h5 class="card-title text-dark fw-bold" style="font-size: 1.1rem;">Laporan Penjualan (R)</h5>
+                        <p class="small text-muted mb-0">Total pendapatan & transaksi</p>
+                    </div>
+                </a>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center p-3 border-secondary">
-                    <i class="fas fa-history fa-3x text-secondary mb-2"></i>
-                    <h5 class="card-title">Riwayat Stok (R)</h5>
-                </div>
+            <div class="col-xl-3 col-md-6">
+                 <a href="#" class="text-decoration-none">
+                    <div class="card text-center p-3 h-100 bg-theme-light" style="border-top: 4px solid var(--color-secondary);">
+                        <i class="fas fa-history fa-2x mb-2" style="color: var(--color-secondary);"></i>
+                        <h5 class="card-title text-dark fw-bold" style="font-size: 1.1rem;">Riwayat Stok (R)</h5>
+                        <p class="small text-muted mb-0">Lacak perubahan stok</p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection
