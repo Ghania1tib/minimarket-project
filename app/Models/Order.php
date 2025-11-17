@@ -9,8 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $table = 'orders';
-
+    // PERBAIKAN: Sesuaikan dengan struktur database orders
     protected $fillable = [
         'user_id',
         'member_id',
@@ -19,46 +18,39 @@ class Order extends Model
         'total_bayar',
         'metode_pembayaran',
         'tipe_pesanan',
-        'status_pesanan'
+        'status_pesanan',
+        // Tambahkan field lain yang ada di database
     ];
 
-    protected $casts = [
-        'subtotal' => 'decimal:2',
-        'total_diskon' => 'decimal:2',
-        'total_bayar' => 'decimal:2',
-    ];
+    // PERBAIKAN: Accessor untuk kompatibilitas
+    public function getTotalHargaAttribute()
+    {
+        return $this->total_bayar;
+    }
 
-    // Relasi ke user (kasir)
+    public function getStatusPembayaranAttribute()
+    {
+        // Default value atau sesuaikan dengan logika bisnis
+        return 'menunggu';
+    }
+
+    public function getMetodePembayaranAttribute()
+    {
+        return $this->attributes['metode_pembayaran'] ?? 'transfer';
+    }
+
+    public function getNomorPesananAttribute()
+    {
+        return 'ORD' . $this->id;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke member
-    public function member()
+    public function items()
     {
-        return $this->belongsTo(Member::class);
-    }
-
-    // Relasi ke order items
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    // Accessor untuk format rupiah
-    public function getSubtotalFormattedAttribute()
-    {
-        return 'Rp ' . number_format($this->subtotal, 0, ',', '.');
-    }
-
-    public function getTotalBayarFormattedAttribute()
-    {
-        return 'Rp ' . number_format($this->total_bayar, 0, ',', '.');
-    }
-
-    public function getTotalDiskonFormattedAttribute()
-    {
-        return 'Rp ' . number_format($this->total_diskon, 0, ',', '.');
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 }

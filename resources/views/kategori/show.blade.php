@@ -40,16 +40,6 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        @if($kategori->icon_url)
-                            <img src="{{ asset('storage/' . $kategori->icon_url) }}"
-                                 class="category-icon mb-3"
-                                 alt="{{ $kategori->nama_kategori }}">
-                        @else
-                            <div class="category-icon bg-light d-flex align-items-center justify-content-center mx-auto mb-3">
-                                <i class="fas fa-tag fa-3x text-muted"></i>
-                            </div>
-                        @endif
-
                         <h3>{{ $kategori->nama_kategori }}</h3>
                         <p class="text-muted">
                             {{ $kategori->products_count }} produk
@@ -88,17 +78,6 @@
                                         <div class="card product-card h-100">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-start">
-                                                    @if($product->gambar_url)
-                                                        <img src="{{ asset('storage/' . $product->gambar_url) }}"
-                                                             class="rounded me-3"
-                                                             alt="{{ $product->nama_produk }}"
-                                                             style="width: 60px; height: 60px; object-fit: cover;">
-                                                    @else
-                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-3"
-                                                             style="width: 60px; height: 60px;">
-                                                            <i class="fas fa-image text-muted"></i>
-                                                        </div>
-                                                    @endif
                                                     <div>
                                                         <h6 class="card-title mb-1">{{ $product->nama_produk }}</h6>
                                                         <p class="card-text mb-1 text-success">

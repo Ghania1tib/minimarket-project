@@ -9,8 +9,7 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'order_items';
-
+    // PERBAIKAN: Sesuaikan dengan struktur database order_items
     protected $fillable = [
         'order_id',
         'product_id',
@@ -19,42 +18,29 @@ class OrderItem extends Model
         'diskon_item'
     ];
 
-    protected $casts = [
-        'harga_saat_beli' => 'decimal:2',
-        'diskon_item' => 'decimal:2',
-    ];
-
-    // Relasi ke order
-    public function order()
+    // PERBAIKAN: Accessor untuk kompatibilitas
+    public function getJumlahAttribute()
     {
-        return $this->belongsTo(Order::class);
+        return $this->quantity;
     }
 
-    // Relasi ke product
-    public function product()
+    public function getHargaSatuanAttribute()
     {
-        return $this->belongsTo(Product::class);
+        return $this->harga_saat_beli;
     }
 
-    // Hitung subtotal per item
     public function getSubtotalAttribute()
     {
-        return ($this->harga_saat_beli - $this->diskon_item) * $this->quantity;
+        return ($this->harga_saat_beli - ($this->diskon_item ?? 0)) * $this->quantity;
     }
 
-    // Accessor untuk format rupiah
-    public function getHargaFormattedAttribute()
+    public function order()
     {
-        return 'Rp ' . number_format($this->harga_saat_beli, 0, ',', '.');
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
-    public function getDiskonFormattedAttribute()
+    public function product()
     {
-        return 'Rp ' . number_format($this->diskon_item, 0, ',', '.');
-    }
-
-    public function getSubtotalFormattedAttribute()
-    {
-        return 'Rp ' . number_format($this->subtotal, 0, ',', '.');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

@@ -24,59 +24,45 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * Cek apakah user adalah owner
-     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    // Method untuk mengecek role
     public function isOwner()
     {
         return $this->role === 'owner';
     }
 
-    /**
-     * Cek apakah user adalah admin
-     */
     public function isAdmin()
     {
-        return $this->role === 'admin' || $this->role === 'owner';
+        return $this->role === 'admin';
     }
 
-    /**
-     * Cek apakah user adalah kasir
-     */
     public function isKasir()
     {
         return $this->role === 'kasir';
     }
 
-    /**
-     * Cek apakah user adalah customer
-     */
     public function isCustomer()
     {
         return $this->role === 'customer';
     }
 
-    /**
-     * Relasi dengan orders
-     */
-    public function orders()
+    // Accessor untuk nama role
+    public function getRoleNameAttribute()
     {
-        return $this->hasMany(Order::class);
-    }
+        $roles = [
+            'owner' => 'Pemilik',
+            'admin' => 'Administrator',
+            'kasir' => 'Kasir',
+            'customer' => 'Pelanggan'
+        ];
 
-    /**
-     * Relasi dengan cart
-     */
-    public function cartItems()
-    {
-        return $this->hasMany(Cart::class);
-    }
-
-    /**
-     * Relasi dengan shifts (jika user adalah kasir)
-     */
-    public function shifts()
-    {
-        return $this->hasMany(Shift::class);
+        return $roles[$this->role] ?? 'Unknown';
     }
 }

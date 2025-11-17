@@ -2,74 +2,124 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class PelangganController extends Controller
 {
     public function dashboard()
     {
         $user = Auth::user();
+        $totalOrders = Order::where('user_id', $user->id)->count();
+        $pendingOrders = Order::where('user_id', $user->id)
+                            ->whereIn('status_pesanan', ['menunggu_pembayaran', 'diproses'])
+                            ->count();
+        $cartCount = Cart::where('user_id', $user->id)->count();
 
-        // Cek role
-        if (!$user->isCustomer()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk pelanggan.');
-        }
+        $orders = Order::where('user_id', $user->id)
+                      ->orderBy('created_at', 'desc')
+                      ->take(5)
+                      ->get();
 
-        // Untuk sementara, kita berikan data kosong untuk orders
-        $recentOrders = collect([]);
-
-        return view('pelanggan.dashboard', compact('user', 'recentOrders'));
+        return view('pelanggan.dashboard', compact(
+            'user',
+            'totalOrders',
+            'pendingOrders',
+            'cartCount',
+            'orders'
+        ));
     }
 
     public function profil()
     {
         $user = Auth::user();
-        if (!$user->isCustomer()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk pelanggan.');
-        }
+        $totalOrders = Order::where('user_id', $user->id)->count();
 
-        return view('pelanggan.profil', compact('user'));
+        return view('pelanggan.profil', compact('user', 'totalOrders'));
     }
 
     public function updateProfil(Request $request)
     {
         $user = Auth::user();
-        if (!$user->isCustomer()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk pelanggan.');
-        }
 
-        $validated = $request->validate([
-            'nama_lengkap' => 'required|min:3|max:50',
-            'no_telepon' => 'required|string|max:20',
-            'alamat' => 'required|string'
+        // Validasi data
+        $validator = Validator::make($request->all(), [
+            'nama_lengkap' => 'required|string|max:255',
+            'no_telepon' => 'required|string|max:20|regex:/^[0-9+\-\s()]+$/',
+            'alamat' => 'required|string|max:1000',
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi',
+            'nama_lengkap.max' => 'Nama lengkap maksimal 255 karakter',
+            'no_telepon.required' => 'Nomor telepon wajib diisi',
+            'no_telepon.max' => 'Nomor telepon maksimal 20 karakter',
+            'no_telepon.regex' => 'Format nomor telepon tidak valid',
+            'alamat.required' => 'Alamat wajib diisi',
+            'alamat.max' => 'Alamat maksimal 1000 karakter',
         ]);
 
-        $user->update($validated);
-
-        return redirect()->back()->with('success', 'Profil berhasil diupdate.');
-    }
-
-    public function riwayatTransaksi()
-    {
-        $user = Auth::user();
-        if (!$user->isCustomer()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk pelanggan.');
+        if ($validator->fails()) {
+            return redirect()->back()
+                           ->withErrors($validator)
+                           ->withInput();
         }
 
-        $orders = collect([]); // Data kosong untuk sementara
+        try {
+            // Update data user
+            $updateData = [
+                'nama_lengkap' => $request->nama_lengkap,
+                'no_telepon' => $request->no_telepon,
+                'alamat' => $request->alamat,
+            ];
 
-        return view('pelanggan.riwayat', compact('orders'));
+            // Handle field name jika berbeda
+            if (empty($user->nama_lengkap) && !empty($user->name)) {
+                $updateData['name'] = $request->nama_lengkap;
+            }
+
+            $user->update($updateData);
+
+            return redirect()->route('pelanggan.profil')
+                           ->with('success', 'Profil berhasil diperbarui');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                           ->with('error', 'Terjadi kesalahan saat mengupdate profil: ' . $e->getMessage())
+                           ->withInput();
+        }
     }
 
-    public function detailTransaksi($order)
+    // Method untuk mengubah password (opsional)
+    public function updatePassword(Request $request)
     {
         $user = Auth::user();
-        if (!$user->isCustomer()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk pelanggan.');
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                           ->withErrors($validator)
+                           ->withInput();
         }
 
-        return view('pelanggan.transaksi-detail', compact('order'));
+        // Cek password lama
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()
+                           ->with('error', 'Password saat ini tidak sesuai');
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return redirect()->route('pelanggan.profil')
+                       ->with('success', 'Password berhasil diubah');
     }
 }

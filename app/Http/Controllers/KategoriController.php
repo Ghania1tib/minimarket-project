@@ -43,23 +43,13 @@ class KategoriController extends Controller
 
         $request->validate([
             'nama_kategori' => 'required|string|max:50|unique:categories',
-            'icon_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ], [
             'nama_kategori.required' => 'Nama kategori wajib diisi.',
             'nama_kategori.unique' => 'Nama kategori sudah ada.',
-            'icon_url.image' => 'File harus berupa gambar.',
-            'icon_url.mimes' => 'Gambar harus berformat: jpeg, png, jpg, gif, svg.',
-            'icon_url.max' => 'Ukuran gambar maksimal 2MB.'
         ]);
-
-        $iconUrl = null;
-        if ($request->hasFile('icon_url')) {
-            $iconUrl = $request->file('icon_url')->store('categories', 'public');
-        }
 
         Category::create([
             'nama_kategori' => $request->nama_kategori,
-            'icon_url' => $iconUrl
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan!');
@@ -101,27 +91,13 @@ class KategoriController extends Controller
 
         $request->validate([
             'nama_kategori' => 'required|string|max:50|unique:categories,nama_kategori,' . $id,
-            'icon_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ], [
             'nama_kategori.required' => 'Nama kategori wajib diisi.',
             'nama_kategori.unique' => 'Nama kategori sudah ada.',
-            'icon_url.image' => 'File harus berupa gambar.',
-            'icon_url.mimes' => 'Gambar harus berformat: jpeg, png, jpg, gif, svg.',
-            'icon_url.max' => 'Ukuran gambar maksimal 2MB.'
         ]);
-
-        $iconUrl = $kategori->icon_url;
-        if ($request->hasFile('icon_url')) {
-            // Hapus icon lama jika ada
-            if ($iconUrl) {
-                Storage::disk('public')->delete($iconUrl);
-            }
-            $iconUrl = $request->file('icon_url')->store('categories', 'public');
-        }
 
         $kategori->update([
             'nama_kategori' => $request->nama_kategori,
-            'icon_url' => $iconUrl
         ]);
 
         return redirect()->route('kategori.index')->with('success', "Kategori berhasil diperbarui!");
@@ -141,12 +117,7 @@ class KategoriController extends Controller
         if ($kategori->products()->count() > 0) {
             return redirect()->route('kategori.index')->with('error', 'Tidak dapat menghapus kategori yang masih memiliki produk!');
         }
-
-        // Hapus icon jika ada
-        if ($kategori->icon_url) {
-            Storage::disk('public')->delete($kategori->icon_url);
-        }
-
+        
         $kategori->delete();
 
         return redirect()->route('kategori.index')->with('success', "Kategori berhasil dihapus!");

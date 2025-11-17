@@ -54,35 +54,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            <div class="mb-3">
-                                <label for="icon_url" class="form-label">Icon Kategori</label>
-
-                                @if($kategori->icon_url)
-                                    <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $kategori->icon_url) }}"
-                                             class="preview-image"
-                                             alt="{{ $kategori->nama_kategori }}">
-                                        <div class="form-text">Icon saat ini</div>
-                                    </div>
-                                @endif
-
-                                <input type="file" class="form-control @error('icon_url') is-invalid @enderror"
-                                       id="icon_url" name="icon_url"
-                                       accept="image/*" onchange="previewNewImage(this)">
-                                <div class="form-text">
-                                    Biarkan kosong jika tidak ingin mengubah icon. Format: JPEG, PNG, JPG, GIF, SVG. Maksimal 2MB.
-                                </div>
-                                @error('icon_url')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-
-                                <!-- New Image Preview -->
-                                <div class="mt-3 text-center">
-                                    <img id="newImagePreview" class="preview-image" src="#" alt="Preview" style="display: none;">
-                                </div>
-                            </div>
-
+                            
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('kategori.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left me-2"></i>Kembali
@@ -97,26 +69,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function previewNewImage(input) {
-            const preview = document.getElementById('newImagePreview');
-            const file = input.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-
-                reader.readAsDataURL(file);
-            } else {
-                preview.style.display = 'none';
-            }
-        }
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

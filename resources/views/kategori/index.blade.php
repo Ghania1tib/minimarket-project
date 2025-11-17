@@ -81,16 +81,6 @@
                 <div class="col-md-4">
                     <div class="card">
                         <div class="card-body text-center">
-                            @if($kategori->icon_url)
-                                <img src="{{ asset('storage/' . $kategori->icon_url) }}"
-                                     class="category-icon mb-3"
-                                     alt="{{ $kategori->nama_kategori }}">
-                            @else
-                                <div class="category-icon bg-light d-flex align-items-center justify-content-center mx-auto mb-3">
-                                    <i class="fas fa-tag fa-2x text-muted"></i>
-                                </div>
-                            @endif
-
                             <h5 class="card-title">{{ $kategori->nama_kategori }}</h5>
                             <p class="card-text text-muted">
                                 <small>{{ $kategori->products_count }} produk</small>
