@@ -78,7 +78,7 @@
         <!-- Search Form -->
         <div class="card mb-4">
             <div class="card-body">
-                <form action="{{ route('member.search') }}" method="GET" class="row g-3">
+                <form action="#" method="GET" class="row g-3">
                     <div class="col-md-8">
                         <input type="text" name="keyword" class="form-control" placeholder="Cari member berdasarkan nama, kode, atau telepon..." value="{{ request('keyword') }}">
                     </div>

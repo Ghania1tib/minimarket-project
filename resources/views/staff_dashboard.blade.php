@@ -296,7 +296,7 @@
                                 </a>
                             </div>
                             <div class="col-md-2 col-sm-4 col-6">
-                                <a href="{{ route('laporan.kasir') }}" class="quick-action-btn text-center">
+                                <a href="#" class="quick-action-btn text-center">
                                     <i class="fas fa-chart-bar fa-2x mb-2 d-block"></i>
                                     <span>Laporan</span>
                                 </a>
