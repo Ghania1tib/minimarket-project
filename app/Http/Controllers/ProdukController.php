@@ -9,73 +9,66 @@ use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $products = Product::with('category')->latest()->get();
+        $products = Product::with('category')->orderBy('created_at', 'desc')->paginate(12);
         return view('produk.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = Category::all();
         return view('produk.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        // Validasi data
         $request->validate([
+            'nama_produk' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'nama_produk' => 'required|string|max:150',
-            'barcode' => 'nullable|string|max:50|unique:products',
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'barcode' => 'nullable|string|max:255',
             'harga_beli' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'stok_kritis' => 'required|integer|min:0'
+            'stok_kritis' => 'required|integer|min:0',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $gambarUrl = null;
-        if ($request->hasFile('gambar')) {
-            $gambarUrl = $request->file('gambar')->store('products', 'public');
+        try {
+            // Handle upload gambar
+            $gambar_url = null;
+            if ($request->hasFile('gambar')) {
+                $gambar_url = $request->file('gambar')->store('products', 'public');
+            }
+
+            // Create product
+            Product::create([
+                'nama_produk' => $request->nama_produk,
+                'category_id' => $request->category_id,
+                'barcode' => $request->barcode,
+                'harga_beli' => $request->harga_beli,
+                'harga_jual' => $request->harga_jual,
+                'stok' => $request->stok,
+                'stok_kritis' => $request->stok_kritis,
+                'deskripsi' => $request->deskripsi,
+                'gambar_url' => $gambar_url
+            ]);
+
+            return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
-
-        Product::create([
-            'category_id' => $request->category_id,
-            'nama_produk' => $request->nama_produk,
-            'barcode' => $request->barcode,
-            'deskripsi' => $request->deskripsi,
-            'gambar_url' => $gambarUrl,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'stok' => $request->stok,
-            'stok_kritis' => $request->stok_kritis
-        ]);
-
-        return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $product = Product::with('category')->findOrFail($id);
         return view('produk.show', compact('product'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $product = Product::findOrFail($id);
@@ -83,82 +76,86 @@ class ProdukController extends Controller
         return view('produk.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
 
+        // Validasi data
         $request->validate([
+            'nama_produk' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'nama_produk' => 'required|string|max:150',
-            'barcode' => 'nullable|string|max:50|unique:products,barcode,' . $id,
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'barcode' => 'nullable|string|max:255',
             'harga_beli' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
-            'stok_kritis' => 'required|integer|min:0'
+            'stok_kritis' => 'required|integer|min:0',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $gambarUrl = $product->gambar_url;
-        if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
-            if ($gambarUrl) {
-                Storage::disk('public')->delete($gambarUrl);
+        try {
+            $data = [
+                'nama_produk' => $request->nama_produk,
+                'category_id' => $request->category_id,
+                'barcode' => $request->barcode,
+                'harga_beli' => $request->harga_beli,
+                'harga_jual' => $request->harga_jual,
+                'stok' => $request->stok,
+                'stok_kritis' => $request->stok_kritis,
+                'deskripsi' => $request->deskripsi,
+            ];
+
+            // Handle upload gambar baru
+            if ($request->hasFile('gambar')) {
+                // Hapus gambar lama jika ada
+                if ($product->gambar_url && Storage::disk('public')->exists($product->gambar_url)) {
+                    Storage::disk('public')->delete($product->gambar_url);
+                }
+
+                $data['gambar_url'] = $request->file('gambar')->store('products', 'public');
             }
-            $gambarUrl = $request->file('gambar')->store('products', 'public');
+
+            // Update product
+            $product->update($data);
+
+            return redirect()->route('produk.index')->with('success', 'Produk berhasil diupdate.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
-
-        $product->update([
-            'category_id' => $request->category_id,
-            'nama_produk' => $request->nama_produk,
-            'barcode' => $request->barcode,
-            'deskripsi' => $request->deskripsi,
-            'gambar_url' => $gambarUrl,
-            'harga_beli' => $request->harga_beli,
-            'harga_jual' => $request->harga_jual,
-            'stok' => $request->stok,
-            'stok_kritis' => $request->stok_kritis
-        ]);
-
-        return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        try {
+            $product = Product::findOrFail($id);
 
-        // Hapus gambar jika ada
-        if ($product->gambar_url) {
-            Storage::disk('public')->delete($product->gambar_url);
+            // Hapus gambar jika ada
+            if ($product->gambar_url && Storage::disk('public')->exists($product->gambar_url)) {
+                Storage::disk('public')->delete($product->gambar_url);
+            }
+
+            $product->delete();
+
+            return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $product->delete();
-
-        return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus!');
     }
 
-    /**
-     * Search products
-     */
     public function search(Request $request)
     {
-        $keyword = $request->input('keyword');
+        $keyword = $request->get('keyword');
 
-        if (!$keyword) {
-            return redirect()->route('produk.index');
-        }
+        $products = Product::with('category')
+            ->where('nama_produk', 'like', "%{$keyword}%")
+            ->orWhere('barcode', 'like', "%{$keyword}%")
+            ->orWhereHas('category', function($query) use ($keyword) {
+                $query->where('nama_kategori', 'like', "%{$keyword}%");
+            })
+            ->paginate(12);
 
-        $products = Product::where('nama_produk', 'LIKE', "%{$keyword}%")
-                          ->orWhere('barcode', 'LIKE', "%{$keyword}%")
-                          ->with('category')
-                          ->paginate(12);
-
-        return view('produk.search_results', compact('products', 'keyword'));
+        return view('produk.index', compact('products', 'keyword'));
     }
 }

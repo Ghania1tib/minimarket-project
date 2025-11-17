@@ -1,37 +1,48 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Kategori - Minimarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: linear-gradient(to right, #ffdde1, #a1c4fd);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .preview-image {
-            max-width: 200px;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #004f7c;">
+@extends('layouts.app')
+
+@section('title', 'Edit Kategori - Minimarket')
+
+@section('navbar')
+    @include('layouts.partials.header')
+    <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('dashboard.staff') }}">
-                <i class="fas fa-cash-register"></i> Kasir Minimarket
+            <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
+                <i class="fas fa-store me-2"></i>TOKO SAUDARA 2
             </a>
+
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('dashboard.staff') }}" title="Dashboard Staff">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="{{ route('produk.index') }}" title="Kelola Produk">
+                    <i class="fas fa-box me-1"></i>Produk
+                </a>
+                <a class="nav-link" href="{{ route('kategori.index') }}" title="Kelola Kategori">
+                    <i class="fas fa-tags me-1"></i>Kategori
+                </a>
+                <a class="nav-link active" href="{{ route('member.index') }}" title="Kelola Member">
+                    <i class="fas fa-users me-1"></i>Member
+                </a>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Menu Akun">
+                        <i class="fas fa-user-circle me-1"></i>{{ Auth::user()->name }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-edit me-2 text-theme-primary"></i>Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </nav>
-
+@endsection
+<body>
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -54,7 +65,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('kategori.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left me-2"></i>Kembali

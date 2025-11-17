@@ -1,21 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>minimarket - Login</title>
-
+    <title>Toko Saudara 2 - Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Gaya dasar (background gradient dan pemusatan) */
+        :root {
+            --color-primary: #5E548E; /* Dark Lilac */
+            --color-secondary: #9F86C0; /* Medium Lilac */
+            --color-accent: #E0B1CB; /* Nude Pink */
+            --color-danger: #E07A5F; /* Soft Coral */
+            --color-light: #F0E6EF; /* Very Light Lilac */
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+        }
+
         body {
-            background: linear-gradient(to right, #ffdde1, #a1c4fd);
+            background: var(--gradient-bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
-            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,28 +28,32 @@
             padding: 15px;
         }
 
-        /* Styling Form Card */
         .login-card {
             max-width: 420px;
             width: 100%;
             padding: 25px;
             background-color: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            border-top: 4px solid #ffb6c1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-top: 5px solid var(--color-primary);
             animation: fadeIn 0.8s ease-out;
         }
 
-        /* Judul */
         .login-card h5 {
-            color: #004f7c;
+            color: var(--color-primary);
             font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
         }
 
-        /* Styling Input Field */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--color-primary);
+        }
+
         .form-control {
             border-radius: 8px;
             border: 1px solid #ced4da;
@@ -54,37 +63,29 @@
         }
 
         .form-control:focus {
-            border-color: #ffb6c1;
-            box-shadow: 0 0 0 0.2rem rgba(255, 182, 193, 0.25);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 0.2rem rgba(160, 134, 192, 0.25);
         }
 
-        /* Styling Label */
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 6px;
-            color: #004f7c;
-        }
-
-        /* Styling Button */
-        .btn-primary {
-            background-color: #004f7c;
-            border-color: #004f7c;
+        .btn-theme-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
             border-radius: 8px;
             padding: 10px;
             font-weight: 600;
             font-size: 0.95rem;
             transition: all 0.3s;
             margin-top: 10px;
+            color: white;
         }
 
-        .btn-primary:hover {
-            background-color: #003366;
-            border-color: #003366;
+        .btn-theme-primary:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
             transform: translateY(-1px);
+            color: white;
         }
 
-        /* Styling Error Alert */
         .alert-danger {
             border-radius: 8px;
             font-size: 0.85rem;
@@ -95,28 +96,25 @@
             margin-bottom: 15px;
         }
 
-        /* Link untuk signup */
-        .signup-link {
-            font-size: 0.85rem;
-            margin-top: 15px;
+        .signup-link a {
+            color: var(--color-danger) !important;
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        /* Animasi */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Icon dalam input */
         .input-icon {
-            color: #ffb6c1;
+            color: var(--color-accent);
             width: 16px;
         }
 
-        /* Checkbox remember me */
         .form-check-input:checked {
-            background-color: #004f7c;
-            border-color: #004f7c;
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
         }
 
         .form-check-label {
@@ -182,15 +180,15 @@
             </div>
 
             <div class="d-grid mt-3">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-theme-primary">
                     <i class="fas fa-sign-in-alt me-2"></i>Masuk
                 </button>
             </div>
         </form>
 
-        <p class="text-center signup-link mb-0">
+        <p class="text-center signup-link mb-0" style="font-size: 0.85rem;">
             Belum punya akun?
-            <a href="{{ route('signup') }}" style="color: #ff6b8b; text-decoration: none; font-weight: 600;">
+            <a href="{{ route('signup') }}">
                 Daftar di sini
             </a>
         </p>

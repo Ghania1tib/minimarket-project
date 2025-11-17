@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,18 +10,25 @@
 
     <style>
         :root {
-            --color-primary: #5E548E; /* Dark Lilac - Teks Utama/Button */
-            --color-secondary: #9F86C0; /* Medium Lilac - Aksen Sekunder */
-            --color-accent: #E0B1CB; /* Nude Pink - Navbar/Highlight */
-            --color-danger: #E07A5F; /* Soft Coral - Flash Sale/Error */
-            --color-success: #70C1B3; /* Soft Teal - Sukses/Add to Cart */
-            --color-light: #F0E6EF; /* Very Light Lilac - BG */
+            --color-primary: #5E548E;
+            /* Dark Lilac - Teks Utama/Button */
+            --color-secondary: #9F86C0;
+            /* Medium Lilac - Aksen Sekunder */
+            --color-accent: #E0B1CB;
+            /* Nude Pink - Navbar/Highlight */
+            --color-danger: #E07A5F;
+            /* Soft Coral - Flash Sale/Error */
+            --color-success: #70C1B3;
+            /* Soft Teal - Sukses/Add to Cart */
+            --color-light: #F0E6EF;
+            /* Very Light Lilac - BG */
             --color-white: #ffffff;
             --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --border-radius-lg: 15px;
             --border-radius-sm: 8px;
-            --container-width: 1200px; /* Ukuran container lebih kecil */
+            --container-width: 1200px;
+            /* Ukuran container lebih kecil */
         }
 
         body {
@@ -41,7 +49,9 @@
             padding-top: 10px;
             padding-bottom: 10px;
         }
-        .navbar-brand, .navbar-nav .nav-link {
+
+        .navbar-brand,
+        .navbar-nav .nav-link {
             font-weight: 700;
             color: var(--color-primary) !important;
             transition: color 0.3s;
@@ -51,7 +61,8 @@
         .content-container {
             max-width: var(--container-width);
             margin: 20px auto;
-            padding: 25px 15px; /* Padding dikurangi */
+            padding: 25px 15px;
+            /* Padding dikurangi */
             background-color: var(--color-white);
             border-radius: var(--border-radius-lg);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
@@ -65,6 +76,7 @@
             font-weight: 600;
             border-radius: var(--border-radius-sm);
         }
+
         .btn-primary-custom:hover {
             background-color: var(--color-secondary);
             border-color: var(--color-secondary);
@@ -77,6 +89,7 @@
             font-weight: 600;
             border-radius: var(--border-radius-sm);
         }
+
         .btn-success-custom {
             background-color: var(--color-success);
             border-color: var(--color-success);
@@ -85,31 +98,77 @@
             border-radius: var(--border-radius-sm);
         }
 
+        /* Tambahkan di bagian style */
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+        }
+
+        .btn-info {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+
+        .btn-warning {
+            background-color: var(--color-danger);
+            border-color: var(--color-danger);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
         /* Utility Classes */
-        .text-theme-primary { color: var(--color-primary) !important; }
-        .bg-theme-accent { background-color: var(--color-accent) !important; }
-        .bg-theme-light { background-color: var(--color-light) !important; }
+        .text-theme-primary {
+            color: var(--color-primary) !important;
+        }
+
+        .bg-theme-accent {
+            background-color: var(--color-accent) !important;
+        }
+
+        .bg-theme-light {
+            background-color: var(--color-light) !important;
+        }
 
         /* Card Styling (DENSITY ADJUSTMENT) */
         .card {
             border-radius: var(--border-radius-lg);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--color-light);
-            transition: transform 0.2s; /* Tambah transisi */
+            transition: transform 0.2s;
+            /* Tambah transisi */
         }
+
         .card:hover {
-            transform: translateY(-2px); /* Efek hover kecil */
+            transform: translateY(-2px);
+            /* Efek hover kecil */
         }
+
         .card-header {
             background-color: var(--color-light);
             color: var(--color-primary);
             font-weight: 600;
             border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
             border-bottom: 1px solid var(--color-accent);
-            padding: 0.75rem 1.25rem; /* Padding header dikurangi */
+            padding: 0.75rem 1.25rem;
+            /* Padding header dikurangi */
         }
+
         .card-body {
-             padding: 1.25rem; /* Padding body default */
+            padding: 1.25rem;
+            /* Padding body default */
         }
 
         /* Alerts (fixed position for flash/session messages) */
@@ -128,10 +187,10 @@
             background-color: var(--color-accent);
             color: var(--color-primary);
         }
-
     </style>
     @stack('styles')
 </head>
+
 <body>
 
     {{-- Alert Section --}}
@@ -211,4 +270,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

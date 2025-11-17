@@ -25,10 +25,12 @@ class Promo extends Model
     ];
 
     protected $casts = [
-        'tanggal_mulai' => 'date',
-        'tanggal_berakhir' => 'date',
+        'tanggal_mulai' => 'datetime',
+        'tanggal_berakhir' => 'datetime',
         'status' => 'boolean'
     ];
+
+    protected $appends = ['is_aktif', 'formatted_nilai', 'status_text', 'persentase_terpakai', 'sisa_kuota'];
 
     public function scopeAktif($query)
     {
@@ -40,8 +42,9 @@ class Promo extends Model
     public function getIsAktifAttribute()
     {
         return $this->status &&
-               now()->between($this->tanggal_mulai, $this->tanggal_berakhir) &&
-               ($this->kuota === null || $this->digunakan < $this->kuota);
+               $this->tanggal_mulai <= now() &&
+               $this->tanggal_berakhir >= now() &&
+               ($this->kuota === null || ($this->digunakan ?? 0) < $this->kuota);
     }
 
     public function getFormattedNilaiAttribute()
@@ -50,5 +53,43 @@ class Promo extends Model
             return $this->nilai_promo . '%';
         }
         return 'Rp ' . number_format($this->nilai_promo, 0, ',', '.');
+    }
+
+    public function getStatusTextAttribute()
+    {
+        return $this->status ? 'Aktif' : 'Nonaktif';
+    }
+
+    public function getPersentaseTerpakaiAttribute()
+    {
+        if (!$this->kuota || $this->kuota == 0) {
+            return 0;
+        }
+
+        $terpakai = $this->digunakan ?? 0;
+        return ($terpakai / $this->kuota) * 100;
+    }
+
+    public function getSisaKuotaAttribute()
+    {
+        if (!$this->kuota) {
+            return 'Unlimited';
+        }
+
+        $terpakai = $this->digunakan ?? 0;
+        return $this->kuota - $terpakai;
+    }
+
+    public function getProgressClassAttribute()
+    {
+        $percentage = $this->persentase_terpakai;
+
+        if ($percentage > 80) {
+            return 'bg-danger';
+        } elseif ($percentage > 50) {
+            return 'bg-warning';
+        } else {
+            return 'bg-success';
+        }
     }
 }

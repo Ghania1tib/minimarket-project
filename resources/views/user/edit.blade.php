@@ -8,85 +8,96 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #004f7c;
-            --secondary-blue: #003366;
-            --accent-pink: #ffb6c1;
-            --light-pink: #ffdde1;
-            --light-blue: #a1c4fd;
-            --gradient-bg: linear-gradient(135deg, #ffdde1 0%, #a1c4fd 100%);
-            --card-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
         }
 
         body {
             background: var(--gradient-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-family);
             min-height: 100vh;
         }
 
         .navbar {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background-color: var(--color-accent);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .navbar-brand,
+        .navbar-nav .nav-link {
+            font-weight: 700;
+            color: var(--color-primary) !important;
+        }
+
         .card {
-            border-radius: 15px;
+            border-radius: var(--border-radius-lg);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
             border: none;
-            background: var(--card-gradient);
+            background: var(--color-white);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-            border: none;
-            border-radius: 8px;
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
             padding: 10px 20px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 79, 124, 0.3);
+            box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);
         }
 
         .btn-outline-primary {
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-            border-radius: 8px;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-outline-primary:hover {
-            background: var(--primary-blue);
+            background: var(--color-primary);
             color: white;
             transform: translateY(-2px);
         }
 
         .form-control {
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             border: 2px solid #e9ecef;
             padding: 10px 15px;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: var(--accent-pink);
-            box-shadow: 0 0 0 0.2rem rgba(255, 182, 193, 0.25);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 0.2rem rgba(224, 177, 203, 0.25);
         }
 
         .form-label {
             font-weight: 600;
-            color: var(--primary-blue);
+            color: var(--color-primary);
             margin-bottom: 8px;
         }
 
         .section-title {
-            color: var(--primary-blue);
+            color: var(--color-primary);
             font-weight: 700;
             margin-bottom: 1rem;
-            border-left: 4px solid var(--accent-pink);
+            border-left: 4px solid var(--color-accent);
             padding-left: 15px;
         }
 
@@ -107,13 +118,13 @@
         }
 
         .password-toggle:hover {
-            color: var(--primary-blue);
+            color: var(--color-primary);
         }
 
         .user-avatar {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-pink) 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -123,6 +134,11 @@
             font-size: 2rem;
             margin: 0 auto;
         }
+
+        .badge-owner { background-color: var(--color-primary); color: white; }
+        .badge-admin { background-color: var(--color-secondary); color: white; }
+        .badge-kasir { background-color: var(--color-danger); color: white; }
+        .badge-customer { background-color: var(--color-success); color: white; }
     </style>
 </head>
 <body>
@@ -317,6 +333,19 @@
                                 @enderror
                             </div>
 
+                            <div class="alert alert-info">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Bergabung:</strong>
+                                        <span class="badge bg-primary">{{ $user->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Terakhir Update:</strong>
+                                        <span class="badge bg-secondary">{{ $user->updated_at->format('d M Y') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                                 <a href="{{ route('user.index') }}" class="btn btn-outline-secondary me-md-2">
                                     <i class="fas fa-times me-2"></i>Batal
@@ -349,7 +378,6 @@
             }
         }
 
-        // Auto format phone number
         document.getElementById('no_telepon').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.startsWith('0')) {

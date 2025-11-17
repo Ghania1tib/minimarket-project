@@ -8,67 +8,77 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #004f7c;
-            --secondary-blue: #003366;
-            --accent-pink: #ffb6c1;
-            --light-pink: #ffdde1;
-            --light-blue: #a1c4fd;
-            --gradient-bg: linear-gradient(135deg, #ffdde1 0%, #a1c4fd 100%);
-            --card-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
         }
 
         body {
             background: var(--gradient-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-family);
             min-height: 100vh;
         }
 
         .navbar {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background-color: var(--color-accent);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .navbar-brand,
+        .navbar-nav .nav-link {
+            font-weight: 700;
+            color: var(--color-primary) !important;
+        }
+
         .card {
-            border-radius: 15px;
+            border-radius: var(--border-radius-lg);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
             border: none;
-            background: var(--card-gradient);
+            background: var(--color-white);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-            border: none;
-            border-radius: 8px;
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
             padding: 10px 20px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 79, 124, 0.3);
         }
 
         .btn-outline-primary {
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-            border-radius: 8px;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-outline-primary:hover {
-            background: var(--primary-blue);
+            background: var(--color-primary);
             color: white;
             transform: translateY(-2px);
         }
 
         .section-title {
-            color: var(--primary-blue);
+            color: var(--color-primary);
             font-weight: 700;
             margin-bottom: 1rem;
-            border-left: 4px solid var(--accent-pink);
+            border-left: 4px solid var(--color-accent);
             padding-left: 15px;
         }
 
@@ -86,7 +96,7 @@
         .user-avatar {
             width: 120px;
             height: 120px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-pink) 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -98,26 +108,26 @@
         }
 
         .info-card {
-            border-left: 4px solid var(--accent-pink);
+            border-left: 4px solid var(--color-accent);
         }
 
         .badge-owner {
-            background: linear-gradient(135deg, #6f42c1 0%, #8e44ad 100%);
+            background-color: var(--color-primary);
             color: white;
         }
 
         .badge-admin {
-            background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
+            background-color: var(--color-secondary);
             color: white;
         }
 
         .badge-kasir {
-            background: linear-gradient(135deg, #fd7e14 0%, #e55a07 100%);
+            background-color: var(--color-danger);
             color: white;
         }
 
         .badge-customer {
-            background: linear-gradient(135deg, #20c997 0%, #198754 100%);
+            background-color: var(--color-success);
             color: white;
         }
     </style>
@@ -198,7 +208,7 @@
                             <div class="col-md-6 mb-4">
                                 <div class="card info-card h-100">
                                     <div class="card-body">
-                                        <h5 class="card-title text-primary">
+                                        <h5 class="card-title" style="color: var(--color-primary);">
                                             <i class="fas fa-info-circle me-2"></i>Informasi Pribadi
                                         </h5>
                                         <table class="table table-borderless">
@@ -226,7 +236,7 @@
                             <div class="col-md-6 mb-4">
                                 <div class="card info-card h-100">
                                     <div class="card-body">
-                                        <h5 class="card-title text-primary">
+                                        <h5 class="card-title" style="color: var(--color-primary);">
                                             <i class="fas fa-map-marker-alt me-2"></i>Alamat
                                         </h5>
                                         @if($user->alamat)
@@ -244,19 +254,19 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title text-primary">
+                                        <h5 class="card-title" style="color: var(--color-primary);">
                                             <i class="fas fa-chart-bar me-2"></i>Statistik
                                         </h5>
                                         <div class="row text-center">
                                             <div class="col-md-3">
                                                 <div class="border-end">
-                                                    <h4 class="text-primary">{{ $user->created_at->diffForHumans() }}</h4>
+                                                    <h4 style="color: var(--color-primary);">{{ $user->created_at->diffForHumans() }}</h4>
                                                     <small class="text-muted">Bergabung</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="border-end">
-                                                    <h4 class="text-success">
+                                                    <h4 style="color: var(--color-success);">
                                                         @php
                                                             $activeStatus = $user->is_active ?? true;
                                                         @endphp
@@ -267,7 +277,7 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="border-end">
-                                                    <h4 class="text-info">
+                                                    <h4 style="color: var(--color-secondary);">
                                                         {{ $user->email_verified_at ? 'Terverifikasi' : 'Belum Verifikasi' }}
                                                     </h4>
                                                     <small class="text-muted">Email</small>
@@ -275,8 +285,7 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div>
-                                                    <h4 class="text-warning">
-                                                        {{-- You can add more statistics here --}}
+                                                    <h4 style="color: var(--color-danger);">
                                                         -
                                                     </h4>
                                                     <small class="text-muted">Aktivitas</small>

@@ -10,16 +10,18 @@ class PromoController extends Controller
 {
     public function index()
     {
-        // Cek authorization
         $user = Auth::user();
         if (!$user->isOwner() && !$user->isAdmin()) {
             abort(403, 'Unauthorized access.');
         }
 
-        $promos = Promo::latest()->get();
+        // GANTI: get() menjadi paginate()
+        $promos = Promo::latest()->paginate(10); // 10 item per halaman
+
         return view('admin.promo.index', compact('promos'));
     }
 
+    // Method lainnya tetap sama...
     public function create()
     {
         $user = Auth::user();
@@ -37,36 +39,44 @@ class PromoController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'kode_promo' => 'required|unique:promos|max:50',
             'nama_promo' => 'required|max:255',
-            'deskripsi' => 'nullable',
+            'deskripsi' => 'nullable|string',
             'jenis_promo' => 'required|in:diskon_persentase,diskon_nominal',
             'nilai_promo' => 'required|numeric|min:0',
             'tanggal_mulai' => 'required|date',
-            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+            'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
             'kuota' => 'nullable|integer|min:1',
-            'minimal_pembelian' => 'nullable|integer|min:0',
-            'maksimal_diskon' => 'nullable|integer|min:0',
-            'status' => 'boolean'
+            'minimal_pembelian' => 'nullable|numeric|min:0',
+            'maksimal_diskon' => 'nullable|numeric|min:0',
+            'status' => 'required|in:1,0'
         ]);
 
-        Promo::create([
-            'kode_promo' => strtoupper($request->kode_promo),
-            'nama_promo' => $request->nama_promo,
-            'deskripsi' => $request->deskripsi,
-            'jenis_promo' => $request->jenis_promo,
-            'nilai_promo' => $request->nilai_promo,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_berakhir' => $request->tanggal_berakhir,
-            'kuota' => $request->kuota,
-            'minimal_pembelian' => $request->minimal_pembelian ?? 0,
-            'maksimal_diskon' => $request->maksimal_diskon,
-            'status' => $request->status ?? true
-        ]);
+        try {
+            Promo::create([
+                'kode_promo' => strtoupper($validated['kode_promo']),
+                'nama_promo' => $validated['nama_promo'],
+                'deskripsi' => $validated['deskripsi'] ?? null,
+                'jenis_promo' => $validated['jenis_promo'],
+                'nilai_promo' => $validated['nilai_promo'],
+                'tanggal_mulai' => $validated['tanggal_mulai'],
+                'tanggal_berakhir' => $validated['tanggal_berakhir'],
+                'kuota' => $validated['kuota'] ?? null,
+                'digunakan' => 0,
+                'minimal_pembelian' => $validated['minimal_pembelian'] ?? 0,
+                'maksimal_diskon' => $validated['maksimal_diskon'] ?? null,
+                'status' => (bool)$validated['status']
+            ]);
 
-        return redirect()->route('promo.index')
-            ->with('success', 'Promo berhasil dibuat!');
+            return redirect()->route('promo.index')
+                ->with('success', 'Promo berhasil dibuat!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     public function show(Promo $promo)
@@ -96,36 +106,43 @@ class PromoController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'kode_promo' => 'required|max:50|unique:promos,kode_promo,' . $promo->id,
             'nama_promo' => 'required|max:255',
-            'deskripsi' => 'nullable',
+            'deskripsi' => 'nullable|string',
             'jenis_promo' => 'required|in:diskon_persentase,diskon_nominal',
             'nilai_promo' => 'required|numeric|min:0',
             'tanggal_mulai' => 'required|date',
-            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+            'tanggal_berakhir' => 'required|date|after_or_equal:tanggal_mulai',
             'kuota' => 'nullable|integer|min:1',
-            'minimal_pembelian' => 'nullable|integer|min:0',
-            'maksimal_diskon' => 'nullable|integer|min:0',
-            'status' => 'boolean'
+            'minimal_pembelian' => 'nullable|numeric|min:0',
+            'maksimal_diskon' => 'nullable|numeric|min:0',
+            'status' => 'required|in:1,0'
         ]);
 
-        $promo->update([
-            'kode_promo' => strtoupper($request->kode_promo),
-            'nama_promo' => $request->nama_promo,
-            'deskripsi' => $request->deskripsi,
-            'jenis_promo' => $request->jenis_promo,
-            'nilai_promo' => $request->nilai_promo,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_berakhir' => $request->tanggal_berakhir,
-            'kuota' => $request->kuota,
-            'minimal_pembelian' => $request->minimal_pembelian ?? 0,
-            'maksimal_diskon' => $request->maksimal_diskon,
-            'status' => $request->status ?? true
-        ]);
+        try {
+            $promo->update([
+                'kode_promo' => strtoupper($validated['kode_promo']),
+                'nama_promo' => $validated['nama_promo'],
+                'deskripsi' => $validated['deskripsi'] ?? null,
+                'jenis_promo' => $validated['jenis_promo'],
+                'nilai_promo' => $validated['nilai_promo'],
+                'tanggal_mulai' => $validated['tanggal_mulai'],
+                'tanggal_berakhir' => $validated['tanggal_berakhir'],
+                'kuota' => $validated['kuota'] ?? null,
+                'minimal_pembelian' => $validated['minimal_pembelian'] ?? 0,
+                'maksimal_diskon' => $validated['maksimal_diskon'] ?? null,
+                'status' => (bool)$validated['status']
+            ]);
 
-        return redirect()->route('promo.index')
-            ->with('success', 'Promo berhasil diupdate!');
+            return redirect()->route('promo.index')
+                ->with('success', 'Promo berhasil diupdate!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     public function destroy(Promo $promo)
@@ -135,9 +152,14 @@ class PromoController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $promo->delete();
+        try {
+            $promo->delete();
+            return redirect()->route('promo.index')
+                ->with('success', 'Promo berhasil dihapus!');
 
-        return redirect()->route('promo.index')
-            ->with('success', 'Promo berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->route('promo.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

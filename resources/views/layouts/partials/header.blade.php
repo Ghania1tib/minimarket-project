@@ -51,7 +51,7 @@
                                 <li><a class="dropdown-item" href="{{ route('pelanggan.profil') }}"><i class="fas fa-user-edit me-2 text-theme-primary"></i>Profil Saya</a></li>
                                 <li><a class="dropdown-item" href="{{ route('pelanggan.pesanan') }}"><i class="fas fa-history me-2 text-theme-primary"></i>Riwayat Pesanan</a></li>
                             @elseif ($userRole === 'admin' || $userRole === 'owner')
-                                <li><a class="dropdown-item" href="{{ route('owner.dashboard') }}"><i class="fas fa-user-shield me-2 text-theme-primary"></i>Dashboard Admin/Owner</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-user-shield me-2 text-theme-primary"></i>Dashboard Admin/Owner</a></li>
                                 <li><a class="dropdown-item" href="{{ route('produk.index') }}"><i class="fas fa-boxes me-2 text-theme-primary"></i>Manajemen Produk</a></li>
                             @elseif ($userRole === 'kasir' || $userRole === 'staff')
                                 <li><a class="dropdown-item" href="{{ route('dashboard.staff') }}"><i class="fas fa-cash-register me-2 text-theme-primary"></i>Dashboard Staff/Kasir</a></li>

@@ -9,36 +9,42 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-blue: #004f7c;
-            --secondary-blue: #003366;
-            --accent-pink: #ffb6c1;
-            --light-pink: #ffdde1;
-            --light-blue: #a1c4fd;
-            --gradient-bg: linear-gradient(135deg, #ffdde1 0%, #a1c4fd 100%);
-            --card-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            --success-color: #28a745;
-            --info-color: #17a2b8;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
         }
 
         body {
             background: var(--gradient-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-family);
             min-height: 100vh;
         }
 
         .navbar {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background-color: var(--color-accent);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .navbar-brand,
+        .navbar-nav .nav-link {
+            font-weight: 700;
+            color: var(--color-primary) !important;
+        }
+
         .card {
-            border-radius: 15px;
+            border-radius: var(--border-radius-lg);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             border: none;
-            background: var(--card-gradient);
+            background: var(--color-white);
             margin-bottom: 20px;
         }
 
@@ -64,18 +70,18 @@
             opacity: 0.3;
         }
 
-        .stats-sales { border-top-color: var(--success-color); color: var(--success-color); }
-        .stats-products { border-top-color: var(--info-color); color: var(--info-color); }
-        .stats-lowstock { border-top-color: var(--warning-color); color: var(--warning-color); }
-        .stats-categories { border-top-color: var(--danger-color); color: var(--danger-color); }
+        .stats-sales { border-top-color: var(--color-success); color: var(--color-success); }
+        .stats-products { border-top-color: var(--color-secondary); color: var(--color-secondary); }
+        .stats-lowstock { border-top-color: var(--color-danger); color: var(--color-danger); }
+        .stats-categories { border-top-color: var(--color-primary); color: var(--color-primary); }
         .stats-users { border-top-color: #6f42c1; color: #6f42c1; }
-        .stats-revenue { border-top-color: #20c997; color: #20c997; }
+        .stats-revenue { border-top-color: var(--color-success); color: var(--color-success); }
 
         .quick-action-btn {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background-color: var(--color-primary);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--border-radius-sm);
             padding: 20px 15px;
             transition: all 0.3s ease;
             text-decoration: none;
@@ -84,14 +90,51 @@
         }
 
         .quick-action-btn:hover {
+            background-color: var(--color-secondary);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 79, 124, 0.3);
+            box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);
             color: white;
         }
 
-        .navbar-brand {
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+        }
+
+        .btn-info {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+
+        .btn-warning {
+            background-color: var(--color-danger);
+            border-color: var(--color-danger);
+        }
+
+        .section-title {
+            color: var(--color-primary);
             font-weight: 700;
-            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--color-accent);
+            padding-left: 15px;
+            font-size: 1.25rem;
+        }
+
+        .activity-item {
+            border-left: 3px solid var(--color-accent);
+            padding-left: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(224, 177, 203, 0.1);
+            border-left-color: var(--color-primary);
         }
 
         .logout-btn {
@@ -105,37 +148,6 @@
             transform: translateY(-1px);
         }
 
-        .section-title {
-            color: var(--primary-blue);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--accent-pink);
-            padding-left: 15px;
-            font-size: 1.25rem;
-        }
-
-        .activity-item {
-            border-left: 3px solid var(--accent-pink);
-            padding-left: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .activity-item:hover {
-            background: rgba(255, 182, 193, 0.1);
-            border-left-color: var(--primary-blue);
-        }
-
-        .product-card {
-            border: 1px solid rgba(0, 79, 124, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .product-card:hover {
-            border-color: var(--accent-pink);
-            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
-        }
-
         .empty-state {
             text-align: center;
             padding: 2rem;
@@ -145,7 +157,7 @@
         .empty-state i {
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: var(--accent-pink);
+            color: var(--color-accent);
         }
 
         .chart-container {
@@ -155,11 +167,11 @@
         }
 
         .management-card {
-            border-left: 4px solid var(--accent-pink);
+            border-left: 4px solid var(--color-accent);
         }
 
         .report-card {
-            border-left: 4px solid var(--primary-blue);
+            border-left: 4px solid var(--color-primary);
         }
 
         .progress {
@@ -170,6 +182,16 @@
         .badge-pill {
             border-radius: 15px;
             padding: 6px 12px;
+        }
+
+        .product-card {
+            border: 1px solid rgba(94, 84, 142, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 5px 15px rgba(224, 177, 203, 0.2);
         }
     </style>
 </head>
@@ -206,7 +228,7 @@
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <h3 class="text-primary mb-1">Selamat Datang, {{ Auth::user()->nama_lengkap }}!</h3>
+                                <h3 class="text-primary mb-1" style="color: var(--color-primary) !important;">Selamat Datang, {{ Auth::user()->nama_lengkap }}!</h3>
                                 <p class="text-muted mb-0">Berikut adalah ringkasan aktivitas dan statistik toko Anda hari ini.</p>
                             </div>
                             <div class="col-md-4 text-end">
@@ -231,7 +253,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">PENJUALAN HARI INI</h6>
-                                <h3 class="text-success mb-1">Rp 2.450.000</h3>
+                                <h3 class="mb-1" style="color: var(--color-success) !important;">Rp 2.450.000</h3>
                                 <small class="text-muted">68 transaksi</small>
                             </div>
                             <div class="align-self-center">
@@ -254,7 +276,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">TOTAL PRODUK</h6>
-                                <h3 class="text-info mb-1">
+                                <h3 class="mb-1" style="color: var(--color-secondary) !important;">
                                     @php
                                         $productCount = 0;
                                         if (class_exists('App\Models\Product')) {
@@ -279,7 +301,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">STOK MENIPIS</h6>
-                                <h3 class="text-warning mb-1">
+                                <h3 class="mb-1" style="color: var(--color-danger) !important;">
                                     @php
                                         $lowStockCount = 0;
                                         if (class_exists('App\Models\Product')) {
@@ -304,7 +326,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">KATEGORI</h6>
-                                <h3 class="text-danger mb-1">
+                                <h3 class="mb-1" style="color: var(--color-primary) !important;">
                                     @php
                                         $categoryCount = 0;
                                         if (class_exists('App\Models\Category')) {
@@ -329,7 +351,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">PENGGUNA</h6>
-                                <h3 class="text-primary mb-1">
+                                <h3 class="mb-1" style="color: #6f42c1 !important;">
                                     @php
                                         $userCount = 0;
                                         if (class_exists('App\Models\User')) {
@@ -354,7 +376,7 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="card-title text-muted mb-2">PENDAPATAN BULAN INI</h6>
-                                <h3 class="text-success mb-1">Rp 48.5 Jt</h3>
+                                <h3 class="mb-1" style="color: var(--color-success) !important;">Rp 48.5 Jt</h3>
                                 <small class="text-muted">Target: Rp 50 Jt</small>
                             </div>
                             <div class="align-self-center">
@@ -363,7 +385,7 @@
                         </div>
                         <div class="mt-2">
                             <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 97%" aria-valuenow="97" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar" style="background-color: var(--color-success); width: 97%" role="progressbar" aria-valuenow="97" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
                     </div>
@@ -451,6 +473,7 @@
             </div>
         </div>
 
+        <!-- Chart and Activity Section -->
         <div class="row mt-4">
             <!-- Chart Penjualan -->
             <div class="col-lg-8">
@@ -510,6 +533,7 @@
             </div>
         </div>
 
+        <!-- Low Stock and Popular Products -->
         <div class="row mt-4">
             <!-- Produk Stok Menipis -->
             <div class="col-lg-6">
@@ -608,7 +632,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Chart Penjualan
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             const salesChart = new Chart(ctx, {
@@ -618,8 +641,8 @@
                     datasets: [{
                         label: 'Pendapatan (Rp)',
                         data: [1200000, 1900000, 1500000, 2200000, 2450000, 3000000, 2800000],
-                        borderColor: '#004f7c',
-                        backgroundColor: 'rgba(0, 79, 124, 0.1)',
+                        borderColor: '#5E548E',
+                        backgroundColor: 'rgba(94, 84, 142, 0.1)',
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4
@@ -647,7 +670,6 @@
                 }
             });
 
-            // Animasi cards
             const cards = document.querySelectorAll('.card');
             cards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;

@@ -8,65 +8,68 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #667eea;
-            --primary-pink: #764ba2;
-            --lilac: #a78bfa;
-            --light-lilac: #c4b5fd;
-            --soft-pink: #f0abfc;
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #a78bfa 0%, #f0abfc 100%);
-            --gradient-light: linear-gradient(135deg, #c4b5fd 0%, #f0abfc 100%);
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--gradient-bg);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-family);
             padding: 20px 0;
         }
 
         .card {
             border: none;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 15px 35px rgba(94, 84, 142, 0.1);
+            background: var(--color-white);
         }
 
         .card-header {
-            background: var(--gradient-primary);
+            background-color: var(--color-primary);
             color: white;
-            border-radius: 20px 20px 0 0 !important;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
             border: none;
             padding: 2rem;
         }
 
         .detail-card {
-            background: var(--gradient-light);
+            background-color: var(--color-light);
             border: none;
-            border-radius: 15px;
-            color: var(--primary-pink);
+            border-radius: var(--border-radius-sm);
+            color: var(--color-primary);
         }
 
         .btn-primary {
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 15px;
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
             padding: 12px 25px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background: var(--gradient-secondary);
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(94, 84, 142, 0.3);
         }
 
         .btn-warning {
-            background: var(--soft-pink);
+            background-color: var(--color-danger);
             border: none;
-            border-radius: 15px;
+            border-radius: var(--border-radius-sm);
             color: white;
             padding: 12px 25px;
             font-weight: 600;
@@ -74,12 +77,12 @@
         }
 
         .btn-warning:hover {
-            background: var(--lilac);
+            background-color: var(--color-secondary);
             transform: translateY(-2px);
         }
 
         .btn-danger {
-            border-radius: 15px;
+            border-radius: var(--border-radius-sm);
             padding: 12px 25px;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -90,26 +93,27 @@
         }
 
         .btn-secondary {
-            background: var(--gradient-light);
+            background-color: var(--color-light);
             border: none;
-            border-radius: 15px;
-            color: var(--primary-pink);
+            border-radius: var(--border-radius-sm);
+            color: var(--color-primary);
             padding: 12px 25px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .btn-secondary:hover {
-            background: var(--gradient-secondary);
+            background-color: var(--color-secondary);
             color: white;
             transform: translateY(-2px);
         }
 
         .badge-diskon {
-            background: var(--gradient-primary);
+            background-color: var(--color-primary);
             font-size: 1.1rem;
             padding: 10px 20px;
             border-radius: 20px;
+            color: white;
         }
 
         .progress {
@@ -120,7 +124,7 @@
 
         .progress-bar {
             border-radius: 10px;
-            background: var(--gradient-primary);
+            background-color: var(--color-primary);
         }
     </style>
 </head>
@@ -135,7 +139,7 @@
                             <p class="mb-0 opacity-75">Informasi lengkap tentang promo</p>
                         </div>
                         <div>
-                            <span class="badge-diskon text-white">{{ $promo->diskon }}% OFF</span>
+                            <span class="badge-diskon">{{ $promo->diskon }}% OFF</span>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -158,7 +162,7 @@
                                             <tr>
                                                 <td><strong>Diskon</strong></td>
                                                 <td>
-                                                    <span class="badge-diskon text-white">{{ $promo->diskon }}%</span>
+                                                    <span class="badge-diskon">{{ $promo->diskon }}%</span>
                                                     @if($promo->maksimal_diskon)
                                                         <br><small class="text-muted">Maksimal: Rp {{ number_format($promo->maksimal_diskon, 0, ',', '.') }}</small>
                                                     @endif
@@ -182,14 +186,14 @@
                                             <tr>
                                                 <td width="40%"><strong>Tanggal Mulai</strong></td>
                                                 <td>
-                                                    <i class="fas fa-play-circle me-1" style="color: var(--primary-blue);"></i>
+                                                    <i class="fas fa-play-circle me-1" style="color: var(--color-primary);"></i>
                                                     {{ $promo->tanggal_mulai->format('d M Y H:i') }}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td><strong>Tanggal Berakhir</strong></td>
                                                 <td>
-                                                    <i class="fas fa-stop-circle me-1" style="color: var(--primary-pink);"></i>
+                                                    <i class="fas fa-stop-circle me-1" style="color: var(--color-primary);"></i>
                                                     {{ $promo->tanggal_berakhir->format('d M Y H:i') }}
                                                 </td>
                                             </tr>
@@ -234,7 +238,7 @@
                                             <i class="fas fa-chart-pie me-2"></i>Penggunaan Kuota
                                         </h5>
                                         <div class="text-center mb-3">
-                                            <h2 style="color: var(--primary-pink);">{{ $promo->sisa_kuota }}</h2>
+                                            <h2 style="color: var(--color-primary);">{{ $promo->sisa_kuota }}</h2>
                                             <p class="text-muted">Sisa Kuota Tersedia</p>
                                         </div>
                                         <div class="progress mb-2">
