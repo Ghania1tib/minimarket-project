@@ -7,26 +7,29 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\MemberController;
-use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\OwnerController; // Ini tidak digunakan tapi tetap dipertahankan
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
-use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffController; // Ini tidak digunakan tapi tetap dipertahankan
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes - Minimarket Project
+| Web Routes - Minimarket Project (Optimized)
 |--------------------------------------------------------------------------
+| Pengaturan urutan prioritas (precedence) rute sangat penting.
+| Rute yang lebih spesifik (`/produk/create`) harus diletakkan SEBELUM
+| rute yang lebih umum (`/produk/{id}`).
 */
 
 // =======================================================================
-// PUBLIC ROUTES (LANDING PAGE & AUTH)
+// 1. PUBLIC & AUTH ROUTES
 // =======================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -46,77 +49,90 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
+
 // =======================================================================
-// PUBLIC PRODUCT & CATEGORY ROUTES (Dapat diakses tanpa login)
+// 2. STAFF/ADMIN PRODUCT MANAGEMENT ROUTES (Authenticated & Specific)
+// =======================================================================
+/* | PENTING: Rute-rute CRUD produk ini harus diutamakan (diletakkan di atas)
+| rute publik /produk/{id} agar /produk/create tidak diinterpretasikan
+| sebagai ID produk.
+*/
+Route::middleware(['auth'])->group(function () {
+
+    Route::prefix('produk')->controller(ProdukController::class)->group(function () {
+        // CRUD Produk (Priority High)
+        Route::get('/create', 'create')->name('produk.create');
+        Route::post('/', 'store')->name('produk.store');
+        Route::get('/{id}/edit', 'edit')->name('produk.edit');
+        Route::put('/{id}', 'update')->name('produk.update');
+        Route::delete('/{id}', 'destroy')->name('produk.destroy');
+        Route::get('/search/admin', 'searchAdmin')->name('produk.search.admin');
+    });
+
+    // CRUD Kategori (Diperlukan juga untuk form Produk/Create)
+    Route::resource('kategori', KategoriController::class)->except(['index', 'show']);
+});
+
+
+// =======================================================================
+// 3. PUBLIC PRODUCT & CATEGORY VIEWS (Unauthenticated & General)
 // =======================================================================
 Route::controller(ProdukController::class)->group(function () {
     Route::get('/produk', 'index')->name('produk.index');
-    Route::get('/produk/{id}', 'show')->name('produk.show'); // FIXED: tambah slash
     Route::get('/produk/search', 'search')->name('produk.search');
+    // Rute paling umum diletakkan di akhir
+    Route::get('/produk/{id}', 'show')->name('produk.show');
 });
 
 Route::controller(KategoriController::class)->group(function () {
     Route::get('/kategori', 'index')->name('kategori.index');
-    Route::get('/kategori/{id}', 'show')->name('kategori.show'); // FIXED: tambah slash
+    Route::get('/kategori/{id}', 'show')->name('kategori.show');
 });
 
-// =======================================================================
-// CART ROUTES (Dapat diakses oleh user yang sudah login)
-// =======================================================================
-Route::middleware(['auth'])->controller(CartController::class)->group(function () {
-    Route::get('/cart', 'index')->name('cart.index');
-    Route::post('/cart/add/{productId}', 'add')->name('cart.add');
-    Route::put('/cart/update/{cart}', 'update')->name('cart.update');
-    Route::delete('/cart/remove/{cart}', 'remove')->name('cart.remove');
-    Route::get('/cart/count', 'count')->name('cart.count');
-    Route::post('/cart/checkout', 'checkout')->name('cart.checkout');
-    Route::delete('/cart/clear', 'clear')->name('cart.clear');
-    Route::get('/cart/data', 'getCartData')->name('cart.data');
-});
-
-Route::middleware(['auth'])->controller(CheckoutController::class)->group(function () {
-    Route::get('/checkout', 'index')->name('checkout');
-});
 
 // =======================================================================
-// PELANGGAN ROUTES
+// 4. E-COMMERCE / PELANGGAN ROUTES (AUTH REQUIRED)
 // =======================================================================
-Route::middleware(['auth'])->prefix('pelanggan')->name('pelanggan.')->group(function () {
-    // Dashboard & Profil
-    Route::controller(PelangganController::class)->group(function () {
-        Route::get('/dashboard', 'dashboard')->name('dashboard');
-        Route::get('/profil', 'profil')->name('profil');
-        Route::put('/profil/update', 'updateProfil')->name('profil.update');
-    });
+Route::middleware(['auth'])->group(function () {
 
-    // Keranjang
+    // Keranjang & Checkout
     Route::controller(CartController::class)->group(function () {
-        Route::get('/keranjang', 'index')->name('keranjang');
+        Route::get('/cart', 'index')->name('cart.index');
+        Route::post('/cart/add/{productId}', 'add')->name('cart.add');
+        Route::put('/cart/update/{cart}', 'update')->name('cart.update');
+        Route::delete('/cart/remove/{cart}', 'remove')->name('cart.remove');
+        Route::get('/cart/count', 'count')->name('cart.count');
+        Route::post('/cart/checkout', 'checkout')->name('cart.checkout');
+        Route::delete('/cart/clear', 'clear')->name('cart.clear');
+        Route::get('/cart/data', 'getCartData')->name('cart.data');
     });
 
-    // Pesanan
-    Route::controller(PesananController::class)->group(function () {
-        Route::get('/pesanan', 'index')->name('pesanan');
-        Route::get('/pesanan/{id}', 'show')->name('pesanan.detail');
-        Route::post('/pesanan/{id}/batalkan', 'batalkan')->name('pesanan.batalkan');
-        Route::post('/pesanan/{id}/bayar', 'bayar')->name('pesanan.bayar');
-        Route::get('/riwayat', 'riwayat')->name('riwayat');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
+    // Pelanggan Dashboard, Profil, Pesanan
+    Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
+        Route::controller(PelangganController::class)->group(function () {
+            Route::get('/dashboard', 'dashboard')->name('dashboard');
+            Route::get('/profil', 'profil')->name('profil');
+            Route::put('/profil/update', 'updateProfil')->name('profil.update');
+        });
+
+        Route::controller(PesananController::class)->group(function () {
+            Route::get('/pesanan', 'index')->name('pesanan');
+            Route::get('/pesanan/{id}', 'show')->name('pesanan.detail');
+            Route::post('/pesanan/{id}/batalkan', 'batalkan')->name('pesanan.batalkan');
+            Route::post('/pesanan/{id}/bayar', 'bayar')->name('pesanan.bayar');
+            Route::get('/riwayat', 'riwayat')->name('riwayat');
+        });
     });
 });
 
+
 // =======================================================================
-// STAFF/KASIR ROUTES - SEMUA ROUTE PRODUK DITEMPATKAN DI SINI
+// 5. STAFF/KASIR POS & DASHBOARD ROUTES (AUTH REQUIRED)
 // =======================================================================
 Route::middleware(['auth'])->group(function () {
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('dashboard.staff');
-
-    // ROUTE PRODUK UNTUK STAFF - PERBAIKAN: TAMBAH SLASH PADA PARAMETER
-    Route::get('/produk/create', [ProdukController::class, 'create'])->name('produk.create');
-    Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
-    Route::get('/produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit'); // FIXED
-    Route::put('/produk/{id}', [ProdukController::class, 'update'])->name('produk.update'); // FIXED
-    Route::delete('/produk/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy'); // FIXED
-    Route::get('/produk/search/admin', [ProdukController::class, 'searchAdmin'])->name('produk.search.admin');
 
     // POS Routes
     Route::prefix('pos')->controller(PosController::class)->group(function () {
@@ -132,44 +148,45 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Route lainnya untuk staff
-    Route::get('/inventory/check', [StaffController::class, 'inventoryCheck'])->name('inventory.check');
-    Route::get('/cashier/report', [StaffController::class, 'cashierReport'])->name('cashier.report');
+    Route::get('/inventory/check', [PosController::class, 'checkInventory'])->name('inventory.check');
+    Route::get('/cashier/report', [PosController::class, 'cashierReport'])->name('cashier.report');
     Route::resource('member', MemberController::class);
 });
 
+
 // =======================================================================
-// OWNER/ADMIN ROUTES
+// 6. OWNER/ADMIN MANAGEMENT ROUTES (AUTH REQUIRED)
 // =======================================================================
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-    Route::resource('kategori', KategoriController::class)->except(['index', 'show']);
     Route::resource('user', UserController::class);
     Route::resource('promo', PromoController::class);
-    Route::post('/promo/{promo}/toggle-status', [PromoController::class, 'toggleStatus'])
-    ->name('promo.toggle-status');
+    Route::post('/promo/{promo}/toggle-status', [PromoController::class, 'toggleStatus'])->name('promo.toggle-status');
+
+    // Tambahkan route untuk OwnerController jika diperlukan, namun saat ini
+    // semua rute admin/owner diarahkan ke AdminController/UserController.
 });
 
+
 // =======================================================================
-// FALLBACK ROUTE UNTUK USER YANG SUDAH LOGIN
+// 7. FALLBACK & REDIRECTS
 // =======================================================================
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    if (($user->role === 'owner') || ($user->role === 'admin')) {
-        return redirect()->route('owner.dashboard');
-    } elseif ($user->role === 'kasir') {
+    if ($user->isOwner() || $user->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->isKasir()) {
         return redirect()->route('dashboard.staff');
-    } elseif ($user->role === 'pelanggan') {
+    } elseif ($user->isCustomer()) {
         return redirect()->route('pelanggan.dashboard');
     }
 
     return redirect('/');
 })->name('dashboard')->middleware('auth');
 
-// =======================================================================
-// FALLBACK ROUTE UNTUK 404
-// =======================================================================
 Route::fallback(function () {
+    // Pastikan Anda memiliki view 'errors.404'
     return response()->view('errors.404', [], 404);
 });
