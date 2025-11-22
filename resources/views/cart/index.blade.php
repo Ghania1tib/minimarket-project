@@ -103,7 +103,7 @@
                                 <i class="fas fa-lock me-2"></i> Lanjut ke Pembayaran
                             </a>
 
-                            <a href="{{ route('home') }}" class="btn btn-outline-light w-100 mt-2">
+                            <a href="{{ route('checkout') }}" class="btn btn-outline-light w-100 mt-2">
                                 <i class="fas fa-arrow-left me-2"></i> Lanjutkan Belanja
                             </a>
                         </div>

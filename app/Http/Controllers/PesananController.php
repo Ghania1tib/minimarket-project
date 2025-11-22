@@ -9,8 +9,15 @@ use Illuminate\Support\Facades\Auth;
 
 class PesananController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function index()
     {
+        // Auth::user() untuk mendapatkan data user - SESUAI MODUL
         $user = Auth::user();
         $orders = Order::where('user_id', $user->id)
                       ->orderBy('created_at', 'desc')

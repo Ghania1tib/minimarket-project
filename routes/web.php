@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 | Web Routes - Minimarket Project (Optimized)
 |--------------------------------------------------------------------------
 | Pengaturan urutan prioritas (precedence) rute sangat penting.
-| Rute yang lebih spesifik (`/produk/create`) harus diletakkan SEBELUM
-| rute yang lebih umum (`/produk/{id}`).
+| Rute yang lebih spesifik (/produk/create) harus diletakkan SEBELUM
+| rute yang lebih umum (/produk/{id}).
 */
 
 // =======================================================================
@@ -106,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/cart/clear', 'clear')->name('cart.clear');
         Route::get('/cart/data', 'getCartData')->name('cart.data');
     });
-
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 
     // Pelanggan Dashboard, Profil, Pesanan

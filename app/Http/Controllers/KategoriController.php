@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     // Menampilkan daftar semua kategori
     public function index()
     {
-        // Cek role untuk akses
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kategories = Category::withCount('products')->latest()->get();
@@ -25,9 +30,8 @@ class KategoriController extends Controller
     // Menampilkan formulir untuk membuat kategori baru
     public function create()
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         return view('kategori.create');
@@ -36,9 +40,8 @@ class KategoriController extends Controller
     // Menyimpan kategori baru ke database
     public function store(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $request->validate([
@@ -58,9 +61,8 @@ class KategoriController extends Controller
     // Menampilkan detail kategori
     public function show($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kategori = Category::with('products')->findOrFail($id);
@@ -70,9 +72,8 @@ class KategoriController extends Controller
     // Form edit kategori
     public function edit($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kategori = Category::findOrFail($id);
@@ -82,9 +83,8 @@ class KategoriController extends Controller
     // Update kategori
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kategori = Category::findOrFail($id);
@@ -106,9 +106,8 @@ class KategoriController extends Controller
     // Hapus kategori
     public function destroy($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kategori = Category::findOrFail($id);
@@ -117,7 +116,7 @@ class KategoriController extends Controller
         if ($kategori->products()->count() > 0) {
             return redirect()->route('kategori.index')->with('error', 'Tidak dapat menghapus kategori yang masih memiliki produk!');
         }
-        
+
         $kategori->delete();
 
         return redirect()->route('kategori.index')->with('success', "Kategori berhasil dihapus!");

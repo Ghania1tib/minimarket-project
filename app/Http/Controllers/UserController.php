@@ -5,11 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function index(Request $request)
     {
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $query = User::query();
 
         // Search functionality
@@ -34,11 +46,19 @@ class UserController extends Controller
 
     public function create()
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('user.create');
     }
 
     public function store(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $request->validate([
             'nama_lengkap' => 'required|min:3|max:50',
             'email' => 'required|email|unique:users',
@@ -48,6 +68,7 @@ class UserController extends Controller
             'alamat' => 'nullable|string|max:255'
         ]);
 
+        // Hash::make() untuk encrypt password - SESUAI MODUL
         User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
@@ -62,11 +83,19 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('user.edit', compact('user'));
     }
 
     public function update(Request $request, User $user)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $request->validate([
             'nama_lengkap' => 'required|min:3|max:50',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -85,6 +114,7 @@ class UserController extends Controller
         ];
 
         if ($request->password) {
+            // Hash::make() untuk encrypt password baru - SESUAI MODUL
             $data['password'] = Hash::make($request->password);
         }
 
@@ -95,6 +125,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Prevent deleting yourself
         if ($user->id === auth()->id()) {
             return redirect()->route('user.index')->with('error', 'Tidak dapat menghapus akun sendiri!');

@@ -145,11 +145,11 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('owner.dashboard') }}">
+            <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
                 <i class="fas fa-users-cog me-2"></i>Manajemen User
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link me-3" href="{{ route('owner.dashboard') }}">
+                <a class="nav-link me-3" href="{{ route('admin.dashboard') }}">
                     <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                 </a>
                 <span class="navbar-text me-3">

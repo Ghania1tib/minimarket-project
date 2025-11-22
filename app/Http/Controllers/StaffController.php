@@ -7,11 +7,17 @@ use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function dashboard()
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         // Logika dashboard staff
@@ -20,9 +26,8 @@ class StaffController extends Controller
 
     public function pos()
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         // Logika POS

@@ -11,8 +11,15 @@ use Illuminate\Support\Facades\Validator;
 
 class PelangganController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman pelanggan
+        $this->middleware('auth');
+    }
+
     public function dashboard()
     {
+        // Auth::user() untuk mendapatkan data user yang login - SESUAI MODUL
         $user = Auth::user();
         $totalOrders = Order::where('user_id', $user->id)->count();
         $pendingOrders = Order::where('user_id', $user->id)
@@ -108,13 +115,13 @@ class PelangganController extends Controller
                            ->withInput();
         }
 
-        // Cek password lama
+        // Langkah 2: Hash::check() untuk verifikasi password lama - SESUAI MODUL
         if (!Hash::check($request->current_password, $user->password)) {
             return redirect()->back()
                            ->with('error', 'Password saat ini tidak sesuai');
         }
 
-        // Update password
+        // Hash::make() untuk encrypt password baru - SESUAI MODUL
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);

@@ -10,12 +10,14 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        if (!Auth::check() || Auth::user()->role !== 'pelanggan') {
-            return redirect()->route('login')->with('error', 'Silakan login sebagai pelanggan');
+        // Langkah 4: Auth::check() untuk proteksi - SESUAI MODUL
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
         }
 
+        // PERBAIKAN: Gunakan user_id bukan pelanggan_id
         $cartItems = Cart::with('product')
-            ->where('pelanggan_id', Auth::id())
+            ->where('user_id', Auth::id())
             ->get();
 
         if ($cartItems->isEmpty()) {

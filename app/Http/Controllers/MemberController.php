@@ -10,14 +10,20 @@ use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $members = Member::latest()->get();
@@ -29,9 +35,8 @@ class MemberController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $kodeMember = Member::generateKodeMember();
@@ -43,9 +48,8 @@ class MemberController extends Controller
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $request->validate([
@@ -78,9 +82,8 @@ class MemberController extends Controller
      */
     public function show($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $member = Member::findOrFail($id);
@@ -92,9 +95,8 @@ class MemberController extends Controller
      */
     public function edit($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $member = Member::findOrFail($id);
@@ -106,9 +108,8 @@ class MemberController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $member = Member::findOrFail($id);
@@ -142,9 +143,8 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
-        if (!$user->isKasir() && !$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk kasir, owner, dan admin.');
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         $member = Member::findOrFail($id);
@@ -164,6 +164,10 @@ class MemberController extends Controller
      */
     public function search(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $keyword = $request->input('keyword');
 
         if (!$keyword) {

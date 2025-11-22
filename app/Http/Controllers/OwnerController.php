@@ -7,12 +7,17 @@ use Illuminate\Support\Facades\Auth;
 
 class OwnerController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function dashboard()
     {
-        // Cek role
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk owner dan admin.');
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         // Logika dashboard owner
@@ -21,9 +26,8 @@ class OwnerController extends Controller
 
     public function users()
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
-            return redirect('/')->with('error', 'Akses ditolak! Hanya untuk owner dan admin.');
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
         }
 
         // Logika management users

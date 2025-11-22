@@ -8,24 +8,27 @@ use Illuminate\Support\Facades\Auth;
 
 class PromoController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function index()
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
-        // GANTI: get() menjadi paginate()
-        $promos = Promo::latest()->paginate(10); // 10 item per halaman
+        $promos = Promo::latest()->paginate(10);
 
         return view('admin.promo.index', compact('promos'));
     }
 
-    // Method lainnya tetap sama...
     public function create()
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -34,8 +37,7 @@ class PromoController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -81,8 +83,7 @@ class PromoController extends Controller
 
     public function show(Promo $promo)
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -91,8 +92,7 @@ class PromoController extends Controller
 
     public function edit(Promo $promo)
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -101,8 +101,7 @@ class PromoController extends Controller
 
     public function update(Request $request, Promo $promo)
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -147,8 +146,7 @@ class PromoController extends Controller
 
     public function destroy(Promo $promo)
     {
-        $user = Auth::user();
-        if (!$user->isOwner() && !$user->isAdmin()) {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 

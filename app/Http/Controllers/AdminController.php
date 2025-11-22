@@ -10,14 +10,26 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     /**
      * Menampilkan dashboard admin
      */
     public function dashboard()
     {
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Data statistik
         $stats = [
             'total_products' => Product::count(),
@@ -123,6 +135,10 @@ class AdminController extends Controller
      */
     public function salesReport(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -143,6 +159,10 @@ class AdminController extends Controller
      */
     public function stockHistory(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $productId = $request->get('product_id');
 
         $query = DB::table('stock_history')
@@ -172,6 +192,10 @@ class AdminController extends Controller
      */
     public function productAnalysis()
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Produk terlaris
         $bestSellingProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -212,6 +236,10 @@ class AdminController extends Controller
      */
     public function exportData(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $type = $request->get('type', 'sales');
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
@@ -226,6 +254,10 @@ class AdminController extends Controller
      */
     public function systemSettings()
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('admin.system-settings');
     }
 
@@ -234,6 +266,10 @@ class AdminController extends Controller
      */
     public function updateSystemSettings(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Validasi input
         $request->validate([
             'store_name' => 'required|string|max:255',

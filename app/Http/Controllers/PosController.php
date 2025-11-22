@@ -12,9 +12,20 @@ use Illuminate\Support\Facades\DB;
 
 class PosController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     // Tampilkan halaman POS
     public function newTransaction()
     {
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $products = Product::with('category')
                           ->where('stok', '>', 0)
                           ->orderBy('nama_produk')
@@ -28,6 +39,13 @@ class PosController extends Controller
     // Proses transaksi
     public function processTransaction(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -129,6 +147,10 @@ class PosController extends Controller
     // Get product details untuk AJAX
     public function getProduct($id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            return response()->json(['error' => 'Unauthorized access.'], 403);
+        }
+
         $product = Product::with('category')->find($id);
 
         if (!$product) {
@@ -148,6 +170,10 @@ class PosController extends Controller
     // Tampilkan invoice
     public function showInvoice($id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $order = Order::with(['orderItems.product', 'user', 'member'])->findOrFail($id);
         return view('pos.invoice', compact('order'));
     }
@@ -155,16 +181,28 @@ class PosController extends Controller
     // Method lain yang sudah ada
     public function checkInventory()
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('inventory_check');
     }
 
     public function manageDiscounts()
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('discount_management');
     }
 
     public function cashierReport()
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return view('cashier_report');
     }
 }

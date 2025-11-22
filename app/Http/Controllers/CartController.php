@@ -15,6 +15,7 @@ class CartController extends Controller
 {
     public function index()
     {
+        // Langkah 4: Auth::check() untuk proteksi - SESUAI MODUL
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk mengakses keranjang');
         }

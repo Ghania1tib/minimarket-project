@@ -10,11 +10,20 @@ class AuthController extends Controller
 {
     public function showSignupForm()
     {
+        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
+        }
         return view('signup');
     }
 
     public function signup(Request $request)
     {
+        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
+        }
+
         $request->validate([
             'nama_lengkap' => 'required|min:3|max:50',
             'email'        => ['required', 'email', 'unique:users'],
@@ -22,9 +31,9 @@ class AuthController extends Controller
                 'required',
                 'string',
                 'min:8',
-                'regex:/[a-z]/', // harus mengandung huruf kecil
-                'regex:/[A-Z]/', // harus mengandung huruf besar
-                'regex:/[0-9]/', // harus mengandung angka
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
             ],
             'no_telepon'   => 'required|string|max:20',
             'alamat'       => 'required|string|max:255',
@@ -44,7 +53,7 @@ class AuthController extends Controller
             'alamat.max'            => 'Alamat maksimal 255 karakter.',
         ]);
 
-        // Buat user baru dengan role customer
+        // Hash::make() untuk encrypt password - SESUAI MODUL
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email'        => $request->email,
@@ -54,54 +63,70 @@ class AuthController extends Controller
             'alamat'       => $request->alamat,
         ]);
 
-        // Login user setelah registrasi
+        // Auth::login() untuk login user - SESUAI MODUL
         Auth::login($user);
 
-        return redirect()->route('pelanggan.dashboard')->with('success', 'Pendaftaran berhasil! Selamat datang.');
+        return $this->redirectToDashboard()->with('success', 'Pendaftaran berhasil! Selamat datang.');
     }
 
     public function showLoginForm()
     {
+        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
+        }
         return view('login');
     }
 
-   public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ], [
-        'email.required'    => 'Alamat email wajib diisi.',
-        'email.email'       => 'Format email tidak valid.',
-        'password.required' => 'Kata sandi wajib diisi.',
-    ]);
-
-    // Coba login dengan credentials
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        $user = Auth::user();
-
-        // Redirect berdasarkan role
-        if ($user->isOwner() || $user->isAdmin()) {
-            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
-        } elseif ($user->isKasir()) {
-            return redirect()->route('dashboard.staff')->with('success', 'Selamat datang, Staff Kasir!');
-        } elseif ($user->isCustomer()) {
-            return redirect()->route('pelanggan.dashboard')->with('success', 'Selamat berbelanja!');
+    public function login(Request $request)
+    {
+        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        if (Auth::check()) {
+            return $this->redirectToDashboard();
         }
-    }
 
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->onlyInput('email');
-}
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ], [
+            'email.required'    => 'Alamat email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Kata sandi wajib diisi.',
+        ]);
+
+        // Langkah 2: Pengecekan Email & Password menggunakan Hash::check() - SESUAI MODUL
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            Auth::login($user);
+            return $this->redirectToDashboard()->with('success', 'Login berhasil!');
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
+    }
 
     public function logout(Request $request)
     {
+        // Langkah 3: Auth::logout() untuk logout - SESUAI MODUL
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'Logout berhasil!');
+    }
+
+    private function redirectToDashboard()
+    {
+        $user = Auth::user();
+        if ($user->isOwner() || $user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isKasir()) {
+            return redirect()->route('dashboard.staff');
+        } elseif ($user->isCustomer()) {
+            return redirect()->route('pelanggan.dashboard');
+        }
+        return redirect('/');
     }
 }

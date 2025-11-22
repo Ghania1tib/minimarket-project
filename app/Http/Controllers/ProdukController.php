@@ -6,23 +6,43 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ProdukController extends Controller
 {
+    public function __construct()
+    {
+        // Langkah 4: Middleware auth untuk proteksi halaman
+        $this->middleware('auth');
+    }
+
     public function index()
     {
+        // Langkah 4: Cek authentication dan role
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $products = Product::with('category')->orderBy('created_at', 'desc')->paginate(12);
         return view('produk.index', compact('products'));
     }
 
     public function create()
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $categories = Category::all();
         return view('produk.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         // Validasi data
         $request->validate([
             'nama_produk' => 'required|string|max:255',
@@ -65,12 +85,20 @@ class ProdukController extends Controller
 
     public function show($id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $product = Product::with('category')->findOrFail($id);
         return view('produk.show', compact('product'));
     }
 
     public function edit($id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $product = Product::findOrFail($id);
         $categories = Category::all();
         return view('produk.edit', compact('product', 'categories'));
@@ -78,6 +106,10 @@ class ProdukController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $product = Product::findOrFail($id);
 
         // Validasi data
@@ -127,6 +159,10 @@ class ProdukController extends Controller
 
     public function destroy($id)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         try {
             $product = Product::findOrFail($id);
 
@@ -146,6 +182,10 @@ class ProdukController extends Controller
 
     public function search(Request $request)
     {
+        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $keyword = $request->get('keyword');
 
         $products = Product::with('category')
