@@ -37,9 +37,19 @@
                     @foreach($cartItems as $item)
                         <div class="row cart-item align-items-center mb-3 p-3 bg-white rounded-3 shadow-sm" style="border: 1px solid var(--color-light);">
                             <div class="col-md-2">
-                                <img src="{{ $item->product->full_gambar_url ?? asset('images/default.png') }}"
-                                     alt="{{ $item->product->nama_produk }}"
-                                     class="img-fluid rounded-3" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--color-accent);">
+                                {{-- PERBAIKAN: Gunakan asset('storage/') seperti di halaman CRUD --}}
+                                @if($item->product->gambar_url)
+                                    <img src="{{ asset('storage/' . $item->product->gambar_url) }}"
+                                         alt="{{ $item->product->nama_produk }}"
+                                         class="img-fluid rounded-3"
+                                         style="width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--color-accent);"
+                                         onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' fill=\'%23f8f9fa\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'Arial, sans-serif\' font-size=\'10\' fill=\'%236c757d\'%3E{{ urlencode($item->product->nama_produk) }}%3C/text%3E%3C/svg%3E'">
+                                @else
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded-3"
+                                         style="width: 80px; height: 80px; border: 2px solid var(--color-accent);">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                @endif
                             </div>
                             <div class="col-md-4">
                                 <h6 class="fw-bold mb-1 text-theme-primary">{{ $item->product->nama_produk }}</h6>
@@ -48,13 +58,13 @@
                                 </small>
                             </div>
                             <div class="col-md-2">
-                                <p class="fw-bold text-success mb-0">Rp {{ number_format($item->harga_satuan ?? 0, 0, ',', '.') }}</p>
+                                <p class="fw-bold text-success mb-0">Rp {{ number_format($item->product->harga_jual, 0, ',', '.') }}</p>
                             </div>
                             <div class="col-md-2">
                                 <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex align-items-center">
                                     @csrf
                                     @method('PUT')
-                                    <input type="number" name="jumlah" value="{{ $item->jumlah }}"
+                                    <input type="number" name="jumlah" value="{{ $item->quantity }}"
                                            min="1" max="{{ $item->product->stok ?? 100 }}"
                                            class="form-control form-control-sm text-center quantity-input">
                                     <button type="submit" class="btn btn-sm btn-outline-primary-custom ms-2" title="Update" style="border-color: var(--color-secondary); color: var(--color-secondary);">
@@ -64,7 +74,7 @@
                                 <small class="text-muted d-block mt-1">Stok: {{ $item->product->stok ?? '?' }}</small>
                             </div>
                             <div class="col-md-2 text-end">
-                                <p class="fw-bold fs-6 mb-1" style="color: var(--color-danger);">Rp {{ number_format($item->subtotal ?? 0, 0, ',', '.') }}</p>
+                                <p class="fw-bold fs-6 mb-1" style="color: var(--color-danger);">Rp {{ number_format($item->quantity * $item->product->harga_jual, 0, ',', '.') }}</p>
                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
@@ -103,7 +113,7 @@
                                 <i class="fas fa-lock me-2"></i> Lanjut ke Pembayaran
                             </a>
 
-                            <a href="{{ route('checkout') }}" class="btn btn-outline-light w-100 mt-2">
+                            <a href="{{ route('home') }}" class="btn btn-outline-light w-100 mt-2">
                                 <i class="fas fa-arrow-left me-2"></i> Lanjutkan Belanja
                             </a>
                         </div>
@@ -116,7 +126,6 @@
 
 @push('scripts')
     <script>
-        // Update cart count (pastikan fungsi ini ada di header/app layout)
         function updateCartCount() {
              fetch('{{ route("cart.count") }}')
                 .then(response => response.json())

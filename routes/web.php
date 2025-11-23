@@ -7,7 +7,6 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\MemberController;
-use App\Http\Controllers\OwnerController; // Ini tidak digunakan tapi tetap dipertahankan
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\PesananController;
@@ -108,6 +107,9 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/pesanan/{id}', [OrderController::class, 'show'])->name('pelanggan.pesanan.detail');
+
 
     // Pelanggan Dashboard, Profil, Pesanan
     Route::prefix('pelanggan')->name('pelanggan.')->group(function () {

@@ -55,7 +55,7 @@
                             <table class="table table-sm table-borderless">
                                 <tr>
                                     <td width="40%">Metode Bayar</td>
-                                    <td>: {{ $order->metode_pembayaran ?? 'Transfer Bank' }}</td>
+                                    <td>: {{ ucfirst($order->metode_pembayaran ?? 'Transfer Bank') }}</td>
                                 </tr>
                                 <tr>
                                     <td>Status Pembayaran</td>
@@ -114,16 +114,18 @@
                                 @if(count($items) > 0)
                                     @foreach($items as $item)
                                     @php
-                                        $subtotal = $item->harga * $item->qty;
+                                        $subtotal = ($item->harga_saat_beli ?? $item->harga) * ($item->quantity ?? $item->qty);
                                         $total += $subtotal;
                                     @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if(isset($item->product->gambar) && $item->product->gambar)
-                                                    <img src="{{ asset('storage/' . $item->product->gambar) }}"
+                                                {{-- PERBAIKAN: Gunakan asset('storage/') seperti di halaman CRUD --}}
+                                                @if(isset($item->product->gambar_url) && $item->product->gambar_url)
+                                                    <img src="{{ asset('storage/' . $item->product->gambar_url) }}"
                                                          alt="{{ $item->product->nama_produk ?? $item->nama_produk }}"
-                                                         class="rounded me-3" width="50" height="50" style="object-fit: cover;">
+                                                         class="rounded me-3" width="50" height="50" style="object-fit: cover;"
+                                                         onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'50\' height=\'50\' viewBox=\'0 0 50 50\'%3E%3Crect width=\'50\' height=\'50\' fill=\'%23f8f9fa\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'Arial, sans-serif\' font-size=\'8\' fill=\'%236c757d\'%3E{{ urlencode($item->product->nama_produk ?? $item->nama_produk) }}%3C/text%3E%3C/svg%3E'">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center me-3"
                                                          style="width: 50px; height: 50px;">
@@ -132,12 +134,12 @@
                                                 @endif
                                                 <div>
                                                     <h6 class="mb-0">{{ $item->product->nama_produk ?? $item->nama_produk }}</h6>
-                                                    <small class="text-muted">SKU: {{ $item->product->sku ?? '-' }}</small>
+                                                    <small class="text-muted">SKU: {{ $item->product->sku ?? $item->product->barcode ?? '-' }}</small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center">{{ $item->qty }}</td>
-                                        <td class="text-end">Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
+                                        <td class="text-center">{{ $item->quantity ?? $item->qty }}</td>
+                                        <td class="text-end">Rp {{ number_format($item->harga_saat_beli ?? $item->harga, 0, ',', '.') }}</td>
                                         <td class="text-end fw-bold">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                                     </tr>
                                     @endforeach

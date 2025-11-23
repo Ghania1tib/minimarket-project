@@ -9,21 +9,23 @@ class Kategori extends Model
 {
     use HasFactory;
 
-    protected $table = 'categories';
+    protected $table = 'categories'; // Tentukan nama tabel secara eksplisit
 
     protected $fillable = [
         'nama_kategori',
-        'icon_url',
+        'deskripsi',
+        'status'
     ];
 
-    /**
-     * TAMBAHKAN FUNGSI INI:
-     * Relasi ke Model Product.
-     * Ini adalah relasi "hasMany" (satu kategori memiliki banyak produk).
-     */
+    // Relasi ke produk
     public function products()
     {
-        // Pastikan Anda punya Model 'Product' (dengan 'c')
-        return $this->hasMany('App\Models\Product', 'category_id');
+        return $this->hasMany(Product::class, 'category_id');
+    }
+
+    // Scope untuk kategori aktif
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
     }
 }

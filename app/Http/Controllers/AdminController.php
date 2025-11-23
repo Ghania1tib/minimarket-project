@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Product;
-use App\Models\Category;
+use App\Models\Kategori;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
@@ -33,7 +33,7 @@ class AdminController extends Controller
         // Data statistik
         $stats = [
             'total_products' => Product::count(),
-            'total_categories' => Category::count(),
+            'total_categories' => Kategori::count(),
             'total_users' => User::count(),
             'low_stock_products' => Product::whereColumn('stok', '<=', 'stok_kritis')->count(),
             'today_sales' => $this->getTodaySales(),

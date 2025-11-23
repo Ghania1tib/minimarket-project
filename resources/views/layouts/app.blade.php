@@ -187,6 +187,67 @@
             background-color: var(--color-accent);
             color: var(--color-primary);
         }
+
+        /* Landing Page Specific Styles */
+        .hero-section {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            border-radius: var(--border-radius-lg);
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .product-card {
+            border: 1px solid var(--color-light);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card {
+            display: block;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--color-light);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-card:hover {
+            background: var(--color-light);
+            text-decoration: none;
+            color: inherit;
+            transform: translateY(-3px);
+        }
     </style>
     @stack('styles')
 </head>
