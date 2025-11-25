@@ -139,7 +139,7 @@ Route::middleware(['auth'])->group(function () {
     // POS Routes
     Route::prefix('pos')->controller(PosController::class)->group(function () {
         Route::get('/new', 'newTransaction')->name('pos.new');
-        Route::post('/process', 'processTransaction')->name('pos.process');
+        Route::post('/process', [PosController::class, 'processTransaction'])->name('pos.process');
         Route::get('/invoice/{id}', 'showInvoice')->name('pos.invoice');
         Route::get('/product/{id}', 'getProduct')->name('pos.product');
         Route::get('/cart-items', 'getCartItems')->name('pos.cart-items');

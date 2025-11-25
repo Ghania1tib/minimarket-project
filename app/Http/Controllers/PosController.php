@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Kategori;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Kategori;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,17 +20,17 @@ class PosController extends Controller
     // Tampilkan halaman POS
     public function newTransaction()
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
         $products = Product::with('kategori')
-                          ->where('stok', '>', 0)
-                          ->orderBy('nama_produk')
-                          ->get();
+            ->where('stok', '>', 0)
+            ->orderBy('nama_produk')
+            ->get();
 
         // Ambil kategori unik dari produk yang tersedia
-        $categories = Kategori::whereHas('products', function($query) {
+        $categories = Kategori::whereHas('products', function ($query) {
             $query->where('stok', '>', 0);
         })->get();
 
@@ -41,16 +40,16 @@ class PosController extends Controller
     // TAMBAHKAN: Method untuk pencarian member berdasarkan nomor telepon
     public function searchMemberByPhone(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
         $phone = $request->get('phone');
 
-        if (!$phone) {
+        if (! $phone) {
             return response()->json([
                 'success' => false,
-                'message' => 'Nomor telepon member tidak boleh kosong'
+                'message' => 'Nomor telepon member tidak boleh kosong',
             ], 400);
         }
 
@@ -58,42 +57,42 @@ class PosController extends Controller
         $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
 
         $member = Member::where('nomor_telepon', $cleanPhone)
-                       ->orWhere('nomor_telepon', 'like', '%' . $cleanPhone . '%')
-                       ->first();
+            ->orWhere('nomor_telepon', 'like', '%' . $cleanPhone . '%')
+            ->first();
 
         if ($member) {
             return response()->json([
                 'success' => true,
-                'member' => [
-                    'id' => $member->id,
-                    'kode_member' => $member->kode_member,
-                    'nama_lengkap' => $member->nama_lengkap,
+                'member'  => [
+                    'id'            => $member->id,
+                    'kode_member'   => $member->kode_member,
+                    'nama_lengkap'  => $member->nama_lengkap,
                     'nomor_telepon' => $member->nomor_telepon,
-                    'poin' => $member->poin,
-                    'diskon' => $member->diskon ?? 10
-                ]
+                    'poin'          => $member->poin,
+                    'diskon'        => $member->diskon ?? 10,
+                ],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Member dengan nomor telepon tersebut tidak ditemukan'
+            'message' => 'Member dengan nomor telepon tersebut tidak ditemukan',
         ], 404);
     }
 
     // Method untuk pencarian member berdasarkan kode
     public function searchMemberByKode(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
         $kode = $request->get('kode');
 
-        if (!$kode) {
+        if (! $kode) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kode member tidak boleh kosong'
+                'message' => 'Kode member tidak boleh kosong',
             ], 400);
         }
 
@@ -102,58 +101,58 @@ class PosController extends Controller
         if ($member) {
             return response()->json([
                 'success' => true,
-                'member' => [
-                    'id' => $member->id,
-                    'kode_member' => $member->kode_member,
-                    'nama_lengkap' => $member->nama_lengkap,
+                'member'  => [
+                    'id'            => $member->id,
+                    'kode_member'   => $member->kode_member,
+                    'nama_lengkap'  => $member->nama_lengkap,
                     'nomor_telepon' => $member->nomor_telepon,
-                    'poin' => $member->poin,
-                    'diskon' => $member->diskon ?? 10
-                ]
+                    'poin'          => $member->poin,
+                    'diskon'        => $member->diskon ?? 10,
+                ],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Member tidak ditemukan'
+            'message' => 'Member tidak ditemukan',
         ], 404);
     }
 
     // Proses transaksi dengan diskon member
     public function processTransaction(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized access.'
+                'message' => 'Unauthorized access.',
             ], 403);
         }
 
         $request->validate([
-            'items' => 'required|array|min:1',
+            'items'              => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'member_id' => 'nullable|exists:members,id',
-            'metode_pembayaran' => 'required|in:tunai,debit_kredit,qris_ewallet',
-            'uang_dibayar' => 'required|numeric|min:0'
+            'items.*.quantity'   => 'required|integer|min:1',
+            'member_id'          => 'nullable|exists:members,id',
+            'metode_pembayaran'  => 'required|in:tunai,debit_kredit,qris_ewallet',
+            'uang_dibayar'       => 'required|numeric|min:0',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $user = Auth::user();
-            $items = $request->items;
-            $memberId = $request->member_id;
+            $user             = Auth::user();
+            $items            = $request->items;
+            $memberId         = $request->member_id;
             $metodePembayaran = $request->metode_pembayaran;
-            $uangDibayar = $request->uang_dibayar;
+            $uangDibayar      = $request->uang_dibayar;
 
             // Hitung total transaksi
-            $subtotal = 0;
+            $subtotal    = 0;
             $totalDiskon = 0;
 
             foreach ($items as $item) {
-                $product = Product::find($item['product_id']);
-                $harga = $product->harga_jual;
+                $product  = Product::find($item['product_id']);
+                $harga    = $product->harga_jual;
                 $quantity = $item['quantity'];
 
                 $subtotal += $harga * $quantity;
@@ -185,28 +184,28 @@ class PosController extends Controller
 
             // Buat order
             $order = Order::create([
-                'user_id' => $user->id,
-                'member_id' => $memberId,
-                'subtotal' => $subtotal,
-                'total_diskon' => $totalDiskon,
-                'total_bayar' => $totalBayar,
+                'user_id'           => $user->id,
+                'member_id'         => $memberId,
+                'subtotal'          => $subtotal,
+                'total_diskon'      => $totalDiskon,
+                'total_bayar'       => $totalBayar,
                 'metode_pembayaran' => $metodePembayaran,
-                'tipe_pesanan' => 'pos',
-                'status_pesanan' => 'selesai'
+                'tipe_pesanan'      => 'pos',
+                'status_pesanan'    => 'selesai',
             ]);
 
             // Buat order items dan update stok
             foreach ($items as $item) {
-                $product = Product::find($item['product_id']);
-                $harga = $product->harga_jual;
+                $product  = Product::find($item['product_id']);
+                $harga    = $product->harga_jual;
                 $quantity = $item['quantity'];
 
                 OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $quantity,
+                    'order_id'        => $order->id,
+                    'product_id'      => $product->id,
+                    'quantity'        => $quantity,
                     'harga_saat_beli' => $harga,
-                    'diskon_item' => 0
+                    'diskon_item'     => 0,
                 ]);
 
                 // Update stok produk
@@ -227,24 +226,24 @@ class PosController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Transaksi berhasil diproses!',
-                'order_id' => $order->id,
-                'subtotal' => $subtotal,
-                'total_diskon' => $totalDiskon,
-                'total_bayar' => $totalBayar,
-                'uang_dibayar' => $uangDibayar,
-                'kembalian' => $kembalian,
-                'poin_bertambah' => $poinBertambah,
-                'invoice_url' => route('pos.invoice', $order->id)
+                'success'           => true,
+                'message'           => 'Transaksi berhasil diproses!',
+                'order_id'          => $order->id,
+                'subtotal'          => $subtotal,
+                'total_diskon'      => $totalDiskon,
+                'total_bayar'       => $totalBayar,
+                'uang_dibayar'      => $uangDibayar,
+                'kembalian'         => $kembalian,
+                'poin_bertambah'    => $poinBertambah,
+                'metode_pembayaran' => $metodePembayaran, // PASTIKAN INI ADA
+                'invoice_url'       => route('pos.invoice', $order->id),
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -252,30 +251,30 @@ class PosController extends Controller
     // Get product details untuk AJAX
     public function getProduct($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
         $product = Product::with('kategori')->find($id);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
         }
 
         return response()->json([
-            'id' => $product->id,
-            'nama_produk' => $product->nama_produk,
-            'harga_jual' => $product->harga_jual,
-            'stok' => $product->stok,
-            'kategori' => $product->kategori ? $product->kategori->nama_kategori : 'Tidak ada kategori',
-            'harga_formatted' => 'Rp ' . number_format($product->harga_jual, 0, ',', '.')
+            'id'              => $product->id,
+            'nama_produk'     => $product->nama_produk,
+            'harga_jual'      => $product->harga_jual,
+            'stok'            => $product->stok,
+            'kategori'        => $product->kategori ? $product->kategori->nama_kategori : 'Tidak ada kategori',
+            'harga_formatted' => 'Rp ' . number_format($product->harga_jual, 0, ',', '.'),
         ]);
     }
 
     // Tampilkan invoice
     public function showInvoice($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -286,7 +285,7 @@ class PosController extends Controller
     // Method untuk cek inventory
     public function checkInventory()
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -296,16 +295,16 @@ class PosController extends Controller
     // Method untuk pencarian produk di inventory check
     public function searchInventory(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
         $searchTerm = $request->get('q');
 
         $products = Product::with('kategori')
-            ->where(function($query) use ($searchTerm) {
-                $query->where('nama_produk', 'like', '%'.$searchTerm.'%')
-                      ->orWhere('barcode', 'like', '%'.$searchTerm.'%');
+            ->where(function ($query) use ($searchTerm) {
+                $query->where('nama_produk', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('barcode', 'like', '%' . $searchTerm . '%');
             })
             ->orderBy('nama_produk')
             ->get();
@@ -316,13 +315,13 @@ class PosController extends Controller
     // Method untuk mendapatkan detail produk di inventory check
     public function getInventoryProductDetail($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
         $product = Product::with('kategori')->find($id);
 
-        if (!$product) {
+        if (! $product) {
             return response()->json(['error' => 'Produk tidak ditemukan'], 404);
         }
 
@@ -332,7 +331,7 @@ class PosController extends Controller
     // Method lain yang sudah ada
     public function manageDiscounts()
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -341,10 +340,40 @@ class PosController extends Controller
 
     public function cashierReport()
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
         return view('cashier_report');
     }
+
+    private function calculateWholesalePrice($product, $quantity)
+    {
+        $harga_normal = $product->harga_jual;
+
+        // Pastikan wholesale_rules berupa array
+        $wholesale_rules = $product->wholesale_rules;
+        if (! is_array($wholesale_rules)) {
+            $wholesale_rules = json_decode($wholesale_rules, true) ?? [];
+        }
+
+        // Cek aturan grosir
+        if (! empty($wholesale_rules)) {
+            // Urutkan dari quantity terbesar
+            usort($wholesale_rules, function ($a, $b) {
+                return $b['min_quantity'] - $a['min_quantity'];
+            });
+
+            // Cari rule yang sesuai
+            foreach ($wholesale_rules as $rule) {
+                if ($quantity >= $rule['min_quantity']) {
+                    $diskon = $harga_normal * ($rule['discount_percent'] / 100);
+                    return $harga_normal - $diskon;
+                }
+            }
+        }
+
+        return $harga_normal;
+    }
+
 }
