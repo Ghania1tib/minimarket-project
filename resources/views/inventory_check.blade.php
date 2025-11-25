@@ -22,6 +22,40 @@
             border-radius: 10px;
             padding: 20px;
             border-left: 5px solid #004f7c;
+            display: none; /* Sembunyikan awal */
+        }
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+            position: absolute;
+            width: calc(100% - 90px);
+            background: white;
+            z-index: 1000;
+        }
+        .search-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .search-item:hover {
+            background-color: #f8f9fa;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+        .stok-habis {
+            color: #dc3545;
+        }
+        .stok-tersedia {
+            color: #198754;
+        }
+        .stok-sedikit {
+            color: #ffc107;
         }
     </style>
 </head>
@@ -33,31 +67,233 @@
         <div class="card-body p-4">
             <div class="input-group mb-4">
                 <span class="input-group-text"><i class="fas fa-barcode"></i></span>
-                <input type="text" class="form-control form-control-lg" placeholder="Masukkan Barcode / Nama Produk..." autofocus>
-                <button class="btn btn-primary"><i class="fas fa-search"></i> Cari</button>
+                <input type="text" id="searchInput" class="form-control form-control-lg"
+                       placeholder="Masukkan Barcode / Nama Produk..." autofocus
+                       autocomplete="off">
+                <button class="btn btn-primary" id="searchBtn">
+                    <i class="fas fa-search"></i> Cari
+                </button>
             </div>
 
-            <div class="result-box mt-4">
-                <h5 class="text-success"><i class="fas fa-check-circle me-2"></i> Produk Ditemukan!</h5>
-                <hr>
-                <div class="row">
-                    <div class="col-md-8">
-                        <h6>Nama: Susu UHT Full Cream 1L</h6>
-                        <p class="mb-1">Barcode: 899xxxxxxx</p>
-                        <p class="mb-1">Kategori: Minuman</p>
-                        <h4 class="text-danger mt-2">Harga Jual: Rp 17.500</h4>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <h1 class="text-primary mt-2">124</h1>
-                        <p class="mb-0 text-muted">Stok Tersedia (Unit)</p>
-                    </div>
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
+                <p class="mt-2">Mencari produk...</p>
+            </div>
+
+            <!-- Search Results Dropdown -->
+            <div class="search-results" id="searchResults"></div>
+
+            <!-- Result Display -->
+            <div class="result-box mt-4" id="resultBox">
+                <!-- Hasil akan ditampilkan di sini oleh JavaScript -->
             </div>
         </div>
         <div class="card-footer text-center">
-            <a href="{{ route('dashboard.staff') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard</a>
+            <a href="{{ route('dashboard.staff') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
+            </a>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchResults = document.getElementById('searchResults');
+            const resultBox = document.getElementById('resultBox');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            // Format angka ke Rupiah
+            function formatRupiah(angka) {
+                if (!angka || isNaN(angka)) {
+                    return 'Rp 0';
+                }
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(angka);
+            }
+
+            // Tentukan class stok berdasarkan jumlah
+            function getStokClass(stok) {
+                if (stok <= 0) {
+                    return 'stok-habis';
+                } else if (stok <= 10) {
+                    return 'stok-sedikit';
+                } else {
+                    return 'stok-tersedia';
+                }
+            }
+
+            // Tentukan status stok
+            function getStokStatus(stok) {
+                if (stok <= 0) {
+                    return 'Stok Habis';
+                } else if (stok <= 10) {
+                    return 'Stok Menipis';
+                } else {
+                    return 'Stok Tersedia (Unit)';
+                }
+            }
+
+            // Tampilkan hasil produk
+            function displayProduct(product) {
+                const stokClass = getStokClass(product.stok);
+                const stokStatus = getStokStatus(product.stok);
+
+                // PERBAIKAN: Gunakan harga_jual bukan harga
+                const hargaJual = product.harga_jual || 0;
+
+                resultBox.innerHTML = `
+                    <h5 class="text-success"><i class="fas fa-check-circle me-2"></i> Produk Ditemukan!</h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Nama: ${product.nama_produk}</h6>
+                            <p class="mb-1">Barcode: ${product.barcode || 'Tidak ada'}</p>
+                            <p class="mb-1">Kategori: ${product.kategori ? product.kategori.nama_kategori : 'Tidak ada kategori'}</p>
+                            <h4 class="text-danger mt-2">Harga Jual: ${formatRupiah(hargaJual)}</h4>
+                            ${product.stok_kritis && product.stok <= product.stok_kritis ?
+                                `<p class="text-warning mt-2"><i class="fas fa-exclamation-triangle"></i> <strong>Stok Kritis!</strong> Stok hampir habis (minimum: ${product.stok_kritis})</p>` :
+                                ''}
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h1 class="${stokClass} mt-2">${product.stok}</h1>
+                            <p class="mb-0 text-muted">${stokStatus}</p>
+                            ${product.stok <= 0 ?
+                                '<p class="text-danger mt-2"><small><i class="fas fa-exclamation-triangle"></i> Stok habis!</small></p>' :
+                                ''}
+                            ${product.stok > 0 && product.stok <= 10 ?
+                                '<p class="text-warning mt-2"><small><i class="fas fa-exclamation-circle"></i> Stok menipis!</small></p>' :
+                                ''}
+                        </div>
+                    </div>
+                    ${product.deskripsi ? `<div class="mt-3"><strong>Deskripsi:</strong><br>${product.deskripsi}</div>` : ''}
+                `;
+                resultBox.style.display = 'block';
+            }
+
+            // Cari produk
+            function searchProducts() {
+                const query = searchInput.value.trim();
+
+                if (query.length === 0) {
+                    alert('Masukkan barcode atau nama produk!');
+                    return;
+                }
+
+                loadingSpinner.style.display = 'block';
+                searchResults.style.display = 'none';
+                resultBox.style.display = 'none';
+
+                fetch(`/inventory/search?q=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(products => {
+                        loadingSpinner.style.display = 'none';
+
+                        if (products.length === 0) {
+                            resultBox.innerHTML = `
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> Produk tidak ditemukan!
+                                </div>
+                            `;
+                            resultBox.style.display = 'block';
+                            return;
+                        }
+
+                        // Jika hanya ada 1 hasil, langsung tampilkan
+                        if (products.length === 1) {
+                            displayProduct(products[0]);
+                        } else {
+                            // Tampilkan dropdown pilihan
+                            showSearchResults(products);
+                        }
+                    })
+                    .catch(error => {
+                        loadingSpinner.style.display = 'none';
+                        console.error('Error:', error);
+                        resultBox.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="fas fa-times-circle me-2"></i> Terjadi kesalahan saat mencari produk.
+                            </div>
+                        `;
+                        resultBox.style.display = 'block';
+                    });
+            }
+
+            // Tampilkan hasil pencarian dalam dropdown
+            function showSearchResults(products) {
+                searchResults.innerHTML = '';
+
+                products.forEach(product => {
+                    const item = document.createElement('div');
+                    item.className = 'search-item';
+
+                    // PERBAIKAN: Gunakan harga_jual bukan harga
+                    const hargaJual = product.harga_jual || 0;
+                    const stokClass = getStokClass(product.stok);
+
+                    item.innerHTML = `
+                        <strong>${product.nama_produk}</strong>
+                        <br>
+                        <small class="text-muted">
+                            Barcode: ${product.barcode || 'Tidak ada'} |
+                            Stok: <span class="${stokClass}">${product.stok}</span> |
+                            Harga: ${formatRupiah(hargaJual)}
+                        </small>
+                    `;
+                    item.addEventListener('click', function() {
+                        displayProduct(product);
+                        searchResults.style.display = 'none';
+                        searchInput.value = product.nama_produk;
+                    });
+                    searchResults.appendChild(item);
+                });
+
+                searchResults.style.display = 'block';
+            }
+
+            // Event Listeners
+            searchBtn.addEventListener('click', searchProducts);
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchProducts();
+                }
+            });
+
+            // Sembunyikan hasil pencarian ketika klik di luar
+            document.addEventListener('click', function(e) {
+                if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Auto-search saat mengetik (opsional, bisa diaktifkan jika diinginkan)
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                if (this.value.length > 2) {
+                    searchTimeout = setTimeout(searchProducts, 500);
+                } else {
+                    searchResults.style.display = 'none';
+                    resultBox.style.display = 'none';
+                }
+            });
+
+            // Focus pada input search saat halaman dimuat
+            searchInput.focus();
+        });
+    </script>
 </body>
 </html>

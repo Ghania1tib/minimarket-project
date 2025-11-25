@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
+use App\Models\Kategori; // UBAH: dari Category ke Kategori
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +23,8 @@ class KategoriController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $kategories = Category::withCount('products')->latest()->get();
+        // PERBAIKAN: Gunakan model Kategori dan variabel yang konsisten
+        $kategories = Kategori::withCount('products')->latest()->get();
         return view('kategori.index', compact('kategories'));
     }
 
@@ -45,13 +46,14 @@ class KategoriController extends Controller
         }
 
         $request->validate([
-            'nama_kategori' => 'required|string|max:50|unique:categories',
+            'nama_kategori' => 'required|string|max:50|unique:categories', // PERBAIKAN: sesuaikan dengan nama tabel
         ], [
             'nama_kategori.required' => 'Nama kategori wajib diisi.',
             'nama_kategori.unique' => 'Nama kategori sudah ada.',
         ]);
 
-        Category::create([
+        // PERBAIKAN: Gunakan model Kategori
+        Kategori::create([
             'nama_kategori' => $request->nama_kategori,
         ]);
 
@@ -65,7 +67,8 @@ class KategoriController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $kategori = Category::with('products')->findOrFail($id);
+        // PERBAIKAN: Gunakan model Kategori
+        $kategori = Kategori::with('products')->findOrFail($id);
         return view('kategori.show', compact('kategori'));
     }
 
@@ -76,7 +79,8 @@ class KategoriController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $kategori = Category::findOrFail($id);
+        // PERBAIKAN: Gunakan model Kategori
+        $kategori = Kategori::findOrFail($id);
         return view('kategori.edit', compact('kategori'));
     }
 
@@ -87,7 +91,8 @@ class KategoriController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $kategori = Category::findOrFail($id);
+        // PERBAIKAN: Gunakan model Kategori
+        $kategori = Kategori::findOrFail($id);
 
         $request->validate([
             'nama_kategori' => 'required|string|max:50|unique:categories,nama_kategori,' . $id,
@@ -110,7 +115,7 @@ class KategoriController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $kategori = Category::findOrFail($id);
+        $kategori = Kategori::findOrFail($id);
 
         // Cek jika kategori memiliki produk
         if ($kategori->products()->count() > 0) {

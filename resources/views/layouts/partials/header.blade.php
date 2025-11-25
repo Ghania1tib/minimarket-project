@@ -136,22 +136,22 @@
                                         <i class="fas fa-tags me-2"></i>Manajemen Kategori
                                     </a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a class="dropdown-item" href="{{ route('transaksi.index') }}">
                                         <i class="fas fa-receipt me-2"></i>Riwayat Transaksi
                                     </a>
-                                </li>
+                                </li> --}}
                             @elseif ($userRole === 'kasir' || $userRole === 'staff')
                                 <li>
                                     <a class="dropdown-item" href="{{ route('pos.new') }}">
                                         <i class="fas fa-barcode me-2"></i>Transaksi POS
                                     </a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a class="dropdown-item" href="{{ route('transaksi.index') }}">
                                         <i class="fas fa-receipt me-2"></i>Riwayat Transaksi
                                     </a>
-                                </li>
+                                </li> --}}
                             @endif
 
                             <li><hr class="dropdown-divider"></li>

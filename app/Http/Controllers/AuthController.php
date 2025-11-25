@@ -19,7 +19,7 @@ class AuthController extends Controller
 
     public function signup(Request $request)
     {
-        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        // Auth::check jika user sudah login, redirect ke dashboard
         if (Auth::check()) {
             return $this->redirectToDashboard();
         }
@@ -53,7 +53,7 @@ class AuthController extends Controller
             'alamat.max'            => 'Alamat maksimal 255 karakter.',
         ]);
 
-        // Hash::make() untuk encrypt password - SESUAI MODUL
+        // Hash::make() untuk encrypt password
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email'        => $request->email,
@@ -63,7 +63,7 @@ class AuthController extends Controller
             'alamat'       => $request->alamat,
         ]);
 
-        // Auth::login() untuk login user - SESUAI MODUL
+        // Auth::login() untuk login user
         Auth::login($user);
 
         return $this->redirectToDashboard()->with('success', 'Pendaftaran berhasil! Selamat datang.');
@@ -80,7 +80,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Langkah 4: Cek jika user sudah login, redirect ke dashboard
+        // Auth::Check jika user sudah login, redirect ke dashboard
         if (Auth::check()) {
             return $this->redirectToDashboard();
         }
@@ -94,7 +94,7 @@ class AuthController extends Controller
             'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
-        // Langkah 2: Pengecekan Email & Password menggunakan Hash::check() - SESUAI MODUL
+        //Pengecekan Email & Password menggunakan Hash::check()
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
@@ -109,7 +109,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Langkah 3: Auth::logout() untuk logout - SESUAI MODUL
+        //Auth::logout() untuk logout
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

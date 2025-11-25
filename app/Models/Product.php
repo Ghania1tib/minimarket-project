@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -61,5 +60,21 @@ class Product extends Model
     public function scopeAvailable($query)
     {
         return $query->where('stok', '>', 0);
+    }
+
+    // Scope untuk pencarian produk
+    public function scopeSearch($query, $term)
+    {
+        return $query->where(function($q) use ($term) {
+            $q->where('nama_produk', 'like', '%'.$term.'%')
+              ->orWhere('barcode', 'like', '%'.$term.'%')
+              ->orWhere('deskripsi', 'like', '%'.$term.'%');
+        });
+    }
+
+    // Scope untuk dengan kategori
+    public function scopeWithKategori($query)
+    {
+        return $query->with('kategori');
     }
 }

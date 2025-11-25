@@ -198,6 +198,48 @@
             color: white;
             font-weight: bold;
         }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            margin: 0;
+        }
+
+        .page-link {
+            color: var(--color-primary);
+            border: 1px solid var(--color-accent);
+            padding: 8px 16px;
+            margin: 0 2px;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            border-color: #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -390,20 +432,49 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                <div class="text-muted">
-                                    @php
-                                        $totalUsers = method_exists($users, 'total') ? $users->total() : $users->count();
-                                        $firstItem = method_exists($users, 'firstItem') ? $users->firstItem() : 1;
-                                        $lastItem = method_exists($users, 'lastItem') ? $users->lastItem() : $totalUsers;
-                                    @endphp
-                                    Menampilkan {{ $firstItem }} - {{ $lastItem }} dari {{ $totalUsers }} user
+                            <div class="pagination-container">
+                                <div class="pagination-info">
+                                    Menampilkan {{ $users->firstItem() }} - {{ $users->lastItem() }} dari {{ $users->total() }} user
                                 </div>
-                                @if(method_exists($users, 'links') && $users->hasPages())
-                                    <nav>
-                                        {{ $users->withQueryString()->links() }}
-                                    </nav>
-                                @endif
+
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination">
+                                        <!-- Previous Page Link -->
+                                        @if ($users->onFirstPage())
+                                            <li class="page-item disabled">
+                                                <span class="page-link">Previous</span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $users->previousPageUrl() }}" rel="prev">Previous</a>
+                                            </li>
+                                        @endif
+
+                                        <!-- Pagination Elements -->
+                                        @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                                            @if ($page == $users->currentPage())
+                                                <li class="page-item active">
+                                                    <span class="page-link">{{ $page }}</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                </li>
+                                            @endif
+                                        @endforeach
+
+                                        <!-- Next Page Link -->
+                                        @if ($users->hasMorePages())
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $users->nextPageUrl() }}" rel="next">Next</a>
+                                            </li>
+                                        @else
+                                            <li class="page-item disabled">
+                                                <span class="page-link">Next</span>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                </nav>
                             </div>
                         @else
                             <div class="empty-state">

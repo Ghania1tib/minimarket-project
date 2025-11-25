@@ -13,13 +13,13 @@ class PelangganController extends Controller
 {
     public function __construct()
     {
-        // Langkah 4: Middleware auth untuk proteksi halaman pelanggan
+        // Middleware auth untuk proteksi halaman pelanggan
         $this->middleware('auth');
     }
 
     public function dashboard()
     {
-        // Auth::user() untuk mendapatkan data user yang login - SESUAI MODUL
+        // Auth::user() untuk mendapatkan data user yang login
         $user = Auth::user();
         $totalOrders = Order::where('user_id', $user->id)->count();
         $pendingOrders = Order::where('user_id', $user->id)
@@ -82,7 +82,6 @@ class PelangganController extends Controller
                 'alamat' => $request->alamat,
             ];
 
-            // Handle field name jika berbeda
             if (empty($user->nama_lengkap) && !empty($user->name)) {
                 $updateData['name'] = $request->nama_lengkap;
             }
@@ -99,7 +98,7 @@ class PelangganController extends Controller
         }
     }
 
-    // Method untuk mengubah password (opsional)
+    // Method untuk mengubah password
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
@@ -115,13 +114,13 @@ class PelangganController extends Controller
                            ->withInput();
         }
 
-        // Langkah 2: Hash::check() untuk verifikasi password lama - SESUAI MODUL
+        // Hash::check() untuk verifikasi password lama
         if (!Hash::check($request->current_password, $user->password)) {
             return redirect()->back()
                            ->with('error', 'Password saat ini tidak sesuai');
         }
 
-        // Hash::make() untuk encrypt password baru - SESUAI MODUL
+        // Hash::make() untuk encrypt password baru
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);

@@ -68,7 +68,7 @@ class UserController extends Controller
             'alamat' => 'nullable|string|max:255'
         ]);
 
-        // Hash::make() untuk encrypt password - SESUAI MODUL
+        // Hash::make() untuk encrypt password
         User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
@@ -114,7 +114,7 @@ class UserController extends Controller
         ];
 
         if ($request->password) {
-            // Hash::make() untuk encrypt password baru - SESUAI MODUL
+            // Hash::make() untuk encrypt password baru
             $data['password'] = Hash::make($request->password);
         }
 

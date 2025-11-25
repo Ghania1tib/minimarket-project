@@ -147,9 +147,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update-cart/{id}', 'updateCart')->name('pos.update-cart');
         Route::delete('/remove-from-cart/{id}', 'removeFromCart')->name('pos.remove-from-cart');
         Route::post('/apply-discount', 'applyDiscount')->name('pos.apply-discount');
+        Route::get('/member/search', 'searchMemberByKode')->name('pos.member.search');
+        Route::get('/member/search-by-phone', 'searchMemberByPhone')->name('pos.member.search.phone');
+        Route::get('/products/search', 'searchProducts')->name('pos.products.search');
     });
 
     // Route lainnya untuk staff
+    Route::get('/inventory/search', [PosController::class, 'searchInventory'])->name('inventory.search');
+    Route::get('/inventory/product/{id}', [PosController::class, 'getInventoryProductDetail'])->name('inventory.product.detail');
     Route::get('/inventory/check', [PosController::class, 'checkInventory'])->name('inventory.check');
     Route::get('/cashier/report', [PosController::class, 'cashierReport'])->name('cashier.report');
     Route::resource('member', MemberController::class);

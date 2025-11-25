@@ -16,7 +16,7 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        // Langkah 4: Middleware auth untuk proteksi halaman
+        //Middleware auth untuk proteksi halaman
         $this->middleware('auth');
     }
 

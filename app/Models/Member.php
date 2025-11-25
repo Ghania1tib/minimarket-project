@@ -17,12 +17,14 @@ class Member extends Model
         'nama_lengkap',
         'nomor_telepon',
         'poin',
-        'tanggal_daftar'
+        'tanggal_daftar',
+        'diskon' // TAMBAHKAN INI
     ];
 
     protected $casts = [
         'tanggal_daftar' => 'date',
-        'poin' => 'integer'
+        'poin' => 'integer',
+        'diskon' => 'integer' // TAMBAHKAN INI
     ];
 
     // Relasi ke user
@@ -58,5 +60,11 @@ class Member extends Model
         }
 
         return $prefix . $date . $newNumber;
+    }
+
+    // TAMBAHKAN: Method untuk mendapatkan diskon member (default 10%)
+    public function getDiskonAttribute($value)
+    {
+        return $value ?? 10; // Default 10% jika tidak diisi
     }
 }

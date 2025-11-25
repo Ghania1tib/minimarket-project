@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Category;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -12,19 +12,29 @@ class ProdukController extends Controller
 {
     public function __construct()
     {
-        // Langkah 4: Middleware auth untuk proteksi halaman
+        // Middleware auth untuk proteksi halaman
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Langkah 4: Cek authentication dan role
+        // Cek authentication dan role
         if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
-        $products = Product::with('category')->orderBy('created_at', 'desc')->paginate(12);
-        return view('produk.index', compact('products'));
+        // Query dasar dengan eager loading
+        $query = Product::with('kategori')->orderBy('created_at', 'desc');
+
+        // Filter berdasarkan kategori jika dipilih
+        if ($request->has('kategori') && $request->kategori != '') {
+            $query->where('category_id', $request->kategori);
+        }
+
+        $products = $query->paginate(12);
+        $categories = Kategori::all();
+
+        return view('produk.index', compact('products', 'categories'));
     }
 
     public function create()
@@ -33,7 +43,7 @@ class ProdukController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $categories = Category::all();
+        $categories = Kategori::all();
         return view('produk.create', compact('categories'));
     }
 
@@ -47,13 +57,13 @@ class ProdukController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'barcode' => 'nullable|string|max:255',
+            'barcode' => 'nullable|string|max:255|unique:products,barcode',
             'harga_beli' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'stok_kritis' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
         try {
@@ -89,7 +99,7 @@ class ProdukController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $product = Product::with('category')->findOrFail($id);
+        $product = Product::with('kategori')->findOrFail($id);
         return view('produk.show', compact('product'));
     }
 
@@ -100,7 +110,7 @@ class ProdukController extends Controller
         }
 
         $product = Product::findOrFail($id);
-        $categories = Category::all();
+        $categories = Kategori::all();
         return view('produk.edit', compact('product', 'categories'));
     }
 
@@ -116,13 +126,13 @@ class ProdukController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'barcode' => 'nullable|string|max:255',
+            'barcode' => 'nullable|string|max:255|unique:products,barcode,' . $id,
             'harga_beli' => 'required|numeric|min:0',
             'harga_jual' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'stok_kritis' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
         try {
@@ -187,15 +197,29 @@ class ProdukController extends Controller
         }
 
         $keyword = $request->get('keyword');
+        $kategori = $request->get('kategori');
 
-        $products = Product::with('category')
-            ->where('nama_produk', 'like', "%{$keyword}%")
-            ->orWhere('barcode', 'like', "%{$keyword}%")
-            ->orWhereHas('category', function($query) use ($keyword) {
-                $query->where('nama_kategori', 'like', "%{$keyword}%");
-            })
-            ->paginate(12);
+        $query = Product::with('kategori');
 
-        return view('produk.index', compact('products', 'keyword'));
+        // Filter berdasarkan kata kunci
+        if ($keyword) {
+            $query->where(function($q) use ($keyword) {
+                $q->where('nama_produk', 'like', "%{$keyword}%")
+                  ->orWhere('barcode', 'like', "%{$keyword}%")
+                  ->orWhereHas('kategori', function($query) use ($keyword) {
+                      $query->where('nama_kategori', 'like', "%{$keyword}%");
+                  });
+            });
+        }
+
+        // Filter berdasarkan kategori jika dipilih
+        if ($kategori && $kategori != '') {
+            $query->where('category_id', $kategori);
+        }
+
+        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+        $categories = Kategori::all();
+
+        return view('produk.index', compact('products', 'categories', 'keyword'));
     }
 }
