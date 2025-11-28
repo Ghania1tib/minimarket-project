@@ -19,9 +19,18 @@ class Product extends Model
         'stok_kritis',
         'deskripsi',
         'gambar_url'
+        // HAPUS: 'wholesale_rules'
     ];
 
     protected $appends = ['is_stok_kritis', 'full_gambar_url'];
+    // HAPUS: 'wholesale_info' dari $appends
+
+    protected $casts = [
+        'harga_beli' => 'decimal:2',
+        'harga_jual' => 'decimal:2',
+        'stok' => 'integer',
+        'stok_kritis' => 'integer'
+    ];
 
     // Relasi ke kategori
     public function kategori()

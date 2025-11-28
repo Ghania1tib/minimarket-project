@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +18,7 @@ class Order extends Model
         'metode_pembayaran',
         'tipe_pesanan',
         'status_pesanan',
-        // Tambahkan field lain yang ada di database
+        'shift_id',
     ];
 
     // PERBAIKAN: Accessor untuk kompatibilitas
@@ -56,5 +55,9 @@ class Order extends Model
     public function orderItem()
     {
         return $this->hasMany(OrderItem::class);
+    }
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 }

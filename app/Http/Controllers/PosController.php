@@ -6,6 +6,7 @@ use App\Models\Member;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -118,7 +119,7 @@ class PosController extends Controller
         ], 404);
     }
 
-    // Proses transaksi dengan diskon member
+    // PERBAIKAN: Proses transaksi dengan diskon member - FIXED
     public function processTransaction(Request $request)
     {
         if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
@@ -127,6 +128,8 @@ class PosController extends Controller
                 'message' => 'Unauthorized access.',
             ], 403);
         }
+
+        $user = Auth::user(); // PERBAIKAN: Definisikan $user di sini
 
         $request->validate([
             'items'              => 'required|array|min:1',
@@ -137,10 +140,18 @@ class PosController extends Controller
             'uang_dibayar'       => 'required|numeric|min:0',
         ]);
 
+        // PERBAIKAN: Pindahkan pemanggilan getActiveShiftId setelah $user didefinisikan
+        $shiftId = $this->getActiveShiftId($user->id);
+        if (! $shiftId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada shift aktif. Harap mulai shift terlebih dahulu sebelum melakukan transaksi.',
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
-            $user             = Auth::user();
             $items            = $request->items;
             $memberId         = $request->member_id;
             $metodePembayaran = $request->metode_pembayaran;
@@ -149,6 +160,7 @@ class PosController extends Controller
             // Hitung total transaksi
             $subtotal    = 0;
             $totalDiskon = 0;
+            $totalWholesaleDiscount = 0; // PERBAIKAN: Tambahkan variabel untuk diskon grosir
 
             foreach ($items as $item) {
                 $product  = Product::find($item['product_id']);
@@ -186,6 +198,7 @@ class PosController extends Controller
             $order = Order::create([
                 'user_id'           => $user->id,
                 'member_id'         => $memberId,
+                'shift_id'          => $shiftId,
                 'subtotal'          => $subtotal,
                 'total_diskon'      => $totalDiskon,
                 'total_bayar'       => $totalBayar,
@@ -231,11 +244,12 @@ class PosController extends Controller
                 'order_id'          => $order->id,
                 'subtotal'          => $subtotal,
                 'total_diskon'      => $totalDiskon,
+                'total_wholesale_discount' => $totalWholesaleDiscount, // PERBAIKAN: Tambahkan ini
                 'total_bayar'       => $totalBayar,
                 'uang_dibayar'      => $uangDibayar,
                 'kembalian'         => $kembalian,
                 'poin_bertambah'    => $poinBertambah,
-                'metode_pembayaran' => $metodePembayaran, // PASTIKAN INI ADA
+                'metode_pembayaran' => $metodePembayaran,
                 'invoice_url'       => route('pos.invoice', $order->id),
             ]);
         } catch (\Exception $e) {
@@ -376,4 +390,17 @@ class PosController extends Controller
         return $harga_normal;
     }
 
+    private function getActiveShiftId($userId)
+    {
+        try {
+            $shift = Shift::where('user_id', $userId)
+                ->where('status', 'active')
+                ->first();
+
+            return $shift ? $shift->id : null;
+        } catch (\Exception $e) {
+            \Log::error('Error getting active shift: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

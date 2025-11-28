@@ -15,6 +15,7 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\StaffController; // Ini tidak digunakan tapi tetap dipertahankan
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CashierReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -48,7 +49,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
 });
 
-
 // =======================================================================
 // 2. STAFF/ADMIN PRODUCT MANAGEMENT ROUTES (Authenticated & Specific)
 // =======================================================================
@@ -72,7 +72,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('kategori', KategoriController::class)->except(['index', 'show']);
 });
 
-
 // =======================================================================
 // 3. PUBLIC PRODUCT & CATEGORY VIEWS (Unauthenticated & General)
 // =======================================================================
@@ -87,7 +86,6 @@ Route::controller(KategoriController::class)->group(function () {
     Route::get('/kategori', 'index')->name('kategori.index');
     Route::get('/kategori/{id}', 'show')->name('kategori.show');
 });
-
 
 // =======================================================================
 // 4. E-COMMERCE / PELANGGAN ROUTES (AUTH REQUIRED)
@@ -110,7 +108,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/pesanan/{id}', [OrderController::class, 'show'])->name('pelanggan.pesanan.detail');
 
-
     // Pelanggan Dashboard, Profil, Pesanan
     Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
         Route::controller(PelangganController::class)->group(function () {
@@ -128,7 +125,6 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
-
 
 // =======================================================================
 // 5. STAFF/KASIR POS & DASHBOARD ROUTES (AUTH REQUIRED)
@@ -156,10 +152,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/inventory/search', [PosController::class, 'searchInventory'])->name('inventory.search');
     Route::get('/inventory/product/{id}', [PosController::class, 'getInventoryProductDetail'])->name('inventory.product.detail');
     Route::get('/inventory/check', [PosController::class, 'checkInventory'])->name('inventory.check');
-    Route::get('/cashier/report', [PosController::class, 'cashierReport'])->name('cashier.report');
     Route::resource('member', MemberController::class);
-});
 
+    // Routes untuk Laporan Kasir
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/cashier/report', [CashierReportController::class, 'cashierReport'])->name('cashier.report');
+        Route::post('/cashier/close-shift', [CashierReportController::class, 'closeShift'])->name('cashier.close-shift');
+        Route::post('/cashier/start-shift', [CashierReportController::class, 'startShift'])->name('cashier.start-shift');
+        Route::get('/cashier/shift/{id}', [CashierReportController::class, 'getShiftDetail'])->name('cashier.shift.detail');
+        Route::get('/cashier/export', [CashierReportController::class, 'exportLaporan'])->name('cashier.export');
+    });
+});
 
 // =======================================================================
 // 6. OWNER/ADMIN MANAGEMENT ROUTES (AUTH REQUIRED)
@@ -174,7 +177,6 @@ Route::middleware(['auth'])->group(function () {
     // Tambahkan route untuk OwnerController jika diperlukan, namun saat ini
     // semua rute admin/owner diarahkan ke AdminController/UserController.
 });
-
 
 // =======================================================================
 // 7. FALLBACK & REDIRECTS

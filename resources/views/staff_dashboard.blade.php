@@ -103,7 +103,6 @@
                             <i class="fas fa-shopping-cart fa-2x"></i>
                         </div>
                         <h6 class="card-title text-muted mb-1 small">PENJUALAN HARI INI</h6>
-                        <h3 class="text-success mb-0 fw-bold">Rp 1.550.000</h3>
                     </div>
                 </div>
             </div>
