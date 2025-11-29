@@ -1,48 +1,6 @@
 @extends('layouts.app')
 
 @section('title', 'Tambah Produk - Minimarket')
-
-@section('navbar')
-    @include('layouts.partials.header')
-    <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
-                <i class="fas fa-store me-2"></i>TOKO SAUDARA 2
-            </a>
-
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('dashboard.staff') }}" title="Dashboard Staff">
-                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                </a>
-                <a class="nav-link" href="{{ route('produk.index') }}" title="Kelola Produk">
-                    <i class="fas fa-box me-1"></i>Produk
-                </a>
-                <a class="nav-link" href="{{ route('kategori.index') }}" title="Kelola Kategori">
-                    <i class="fas fa-tags me-1"></i>Kategori
-                </a>
-                <a class="nav-link active" href="{{ route('member.index') }}" title="Kelola Member">
-                    <i class="fas fa-users me-1"></i>Member
-                </a>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Menu Akun">
-                        <i class="fas fa-user-circle me-1"></i>{{ Auth::user()->name }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-edit me-2 text-theme-primary"></i>Profil</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-@endsection
-
 @section('content')
     <div class="content-container">
         <div class="d-flex justify-content-between align-items-center mb-3">

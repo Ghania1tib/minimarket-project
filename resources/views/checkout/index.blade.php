@@ -12,7 +12,7 @@
         <div class="row g-4">
             <!-- Form Checkout -->
             <div class="col-lg-8">
-                <form action="{{ route('cart.checkout') }}" method="POST" id="checkout-form">
+                <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
                     @csrf
 
                     <!-- Informasi Pengiriman -->
@@ -31,6 +31,11 @@
                                 </div>
                             @endif
 
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Gratis Ongkir!</strong> Untuk wilayah sekitar Rumbai. Sistem akan otomatis mendeteksi alamat Anda.
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Nama Lengkap *</label>
@@ -43,7 +48,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">No. Telepon *</label>
                                     <input type="text" name="no_telepon" class="form-control @error('no_telepon') is-invalid @enderror"
-                                           value="{{ old('no_telepon', $user->no_telepon ?? '') }}" required>
+                                           value="{{ old('no_telepon', $user->no_telepon ?? $user->phone ?? '') }}" required>
                                     @error('no_telepon')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -51,19 +56,25 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Alamat Lengkap *</label>
-                                <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3" required>{{ old('alamat', $user->alamat ?? '') }}</textarea>
+                                <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3" required
+                                          placeholder="Contoh: Jl. Kaharuddin Nasution Gg. Melati No. 110">{{ old('alamat', $user->alamat ?? $user->address ?? '') }}</textarea>
                                 @error('alamat')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="text-muted">Sertakan nama jalan, gang, dan nomor rumah. Cantumkan 'Rumbai' jika di wilayah Rumbai untuk gratis ongkir.</small>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Kota *</label>
                                     <input type="text" name="kota" class="form-control @error('kota') is-invalid @enderror"
-                                           value="{{ old('kota') }}" required>
+                                           value="{{ old('kota', 'Pekanbaru') }}" required>
                                     @error('kota')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Kode Pos</label>
+                                    <input type="text" name="kode_pos" class="form-control" value="28284" placeholder="28284">
                                 </div>
                             </div>
                         </div>
@@ -82,7 +93,7 @@
                                         <span class="fw-bold">Reguler</span>
                                         <p class="mb-0 text-muted">Estimasi 3-5 hari</p>
                                     </div>
-                                    <span class="fw-bold text-primary">Rp 15.000</span>
+                                    <span class="fw-bold text-primary" id="reguler-cost">Rp 15.000</span>
                                 </label>
                             </div>
                             <div class="form-check">
@@ -92,8 +103,14 @@
                                         <span class="fw-bold">Express</span>
                                         <p class="mb-0 text-muted">Estimasi 1-2 hari</p>
                                     </div>
-                                    <span class="fw-bold text-primary">Rp 25.000</span>
+                                    <span class="fw-bold text-primary" id="express-cost">Rp 25.000</span>
                                 </label>
+                            </div>
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <small class="text-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    <span id="shipping-info">Gratis ongkir untuk wilayah Rumbai akan diterapkan otomatis</span>
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -106,11 +123,10 @@
                         <div class="card-body">
                             <div class="payment-methods">
                                 @php
-                                // SESUAIKAN DENGAN ENUM DI DATABASE: tunai, debit_kredit, qris_ewallet
                                 $paymentMethods = [
                                     ['id' => 'tunai', 'icon' => 'fas fa-money-bill-wave', 'color' => 'success', 'title' => 'Tunai (COD)', 'subtitle' => 'Bayar ketika barang sampai'],
-                                    ['id' => 'debit_kredit', 'icon' => 'fas fa-credit-card', 'color' => 'primary', 'title' => 'Kartu Debit/Kredit', 'subtitle' => 'VISA, MasterCard, BCA Card'],
-                                    ['id' => 'qris_ewallet', 'icon' => 'fas fa-qrcode', 'color' => 'warning', 'title' => 'QRIS & E-Wallet', 'subtitle' => 'Gopay, OVO, Dana, ShopeePay'],
+                                    ['id' => 'transfer', 'icon' => 'fas fa-university', 'color' => 'primary', 'title' => 'Transfer Bank', 'subtitle' => 'Mandiri, BCA, BRI, BNI'],
+                                    ['id' => 'qris', 'icon' => 'fas fa-qrcode', 'color' => 'warning', 'title' => 'QRIS', 'subtitle' => 'Gopay, OVO, Dana, ShopeePay'],
                                 ];
                                 @endphp
 
@@ -130,6 +146,23 @@
                                 </div>
                                 @endforeach
                             </div>
+
+                            <!-- Informasi Pembayaran -->
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <small class="text-info">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <span id="payment-instruction">
+                                        @if(old('metode_pembayaran', 'tunai') == 'tunai')
+                                            Bayar tunai ketika barang sampai (COD)
+                                        @elseif(old('metode_pembayaran', 'tunai') == 'transfer')
+                                            Transfer ke rekening bank yang akan ditampilkan di halaman berikutnya
+                                        @else
+                                            Scan QRIS yang akan ditampilkan di halaman berikutnya
+                                        @endif
+                                    </span>
+                                </small>
+                            </div>
+
                             @error('metode_pembayaran')
                                 <div class="text-danger mt-2">
                                     <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
@@ -192,7 +225,7 @@
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Biaya Pengiriman:</span>
-                                <span id="shipping-cost">Rp 15.000</span>
+                                <span id="shipping-cost-display">Rp 15.000</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Biaya Layanan:</span>
@@ -316,6 +349,47 @@
                 checkIcon.classList.remove('d-none');
             }
         }
+
+        // Update payment instruction
+        const instructionElement = document.getElementById('payment-instruction');
+        if (instructionElement) {
+            if (method === 'tunai') {
+                instructionElement.textContent = 'Bayar tunai ketika barang sampai (COD)';
+            } else if (method === 'transfer') {
+                instructionElement.textContent = 'Transfer ke rekening bank yang akan ditampilkan di halaman berikutnya';
+            } else if (method === 'qris') {
+                instructionElement.textContent = 'Scan QRIS yang akan ditampilkan di halaman berikutnya';
+            }
+        }
+    }
+
+    function calculateShippingCost() {
+        const alamat = document.querySelector('textarea[name="alamat"]').value.toLowerCase();
+        const kota = document.querySelector('input[name="kota"]').value.toLowerCase();
+        const metodePengiriman = document.querySelector('input[name="metode_pengiriman"]:checked').value;
+
+        // Cek apakah alamat mengandung "rumbai"
+        const isRumbaiArea = alamat.includes('rumbai') || kota.includes('rumbai');
+
+        let shippingCost = 0;
+        if (!isRumbaiArea) {
+            shippingCost = metodePengiriman === 'express' ? 25000 : 15000;
+        }
+
+        // Update tampilan
+        const shippingDisplay = document.getElementById('shipping-cost-display');
+        const totalPayment = document.getElementById('total-payment');
+        const subtotal = {{ $total }};
+        const total = subtotal + shippingCost;
+
+        shippingDisplay.textContent = isRumbaiArea ? 'Gratis' : `Rp ${shippingCost.toLocaleString('id-ID')}`;
+        totalPayment.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+
+        // Update info
+        document.getElementById('shipping-info').textContent =
+            isRumbaiArea ? 'Gratis ongkir diterapkan untuk wilayah Rumbai' : 'Ongkir berlaku untuk luar wilayah Rumbai';
+
+        return shippingCost;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -327,10 +401,10 @@
             console.log('Initial payment method:', checkedRadio.value);
             selectPayment(checkedRadio.value);
         } else {
-            // Default to first method if none selected
-            const firstMethod = document.querySelector('.payment-method');
-            if (firstMethod) {
-                const methodId = firstMethod.getAttribute('data-method');
+            // Default to 'tunai' jika tidak ada yang terpilih
+            const tunaiMethod = document.querySelector('[data-method="tunai"]');
+            if (tunaiMethod) {
+                const methodId = tunaiMethod.getAttribute('data-method');
                 selectPayment(methodId);
             }
         }
@@ -344,18 +418,18 @@
             });
         });
 
-        // Update biaya pengiriman dan total saat metode pengiriman berubah
+        // Update biaya pengiriman saat metode pengiriman berubah
         const shippingRadios = document.querySelectorAll('input[name="metode_pengiriman"]');
         shippingRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const shippingCost = this.value === 'express' ? 25000 : 15000;
-                document.getElementById('shipping-cost').textContent = 'Rp ' + shippingCost.toLocaleString('id-ID');
-
-                const subtotal = {{ $total }};
-                const totalPayment = subtotal + shippingCost;
-                document.getElementById('total-payment').textContent = 'Rp ' + totalPayment.toLocaleString('id-ID');
-            });
+            radio.addEventListener('change', calculateShippingCost);
         });
+
+        // Update biaya pengiriman saat alamat diubah
+        document.querySelector('textarea[name="alamat"]').addEventListener('input', calculateShippingCost);
+        document.querySelector('input[name="kota"]').addEventListener('input', calculateShippingCost);
+
+        // Hitung ongkir pertama kali
+        calculateShippingCost();
 
         // Validasi form sebelum submit
         document.getElementById('checkout-form').addEventListener('submit', function(e) {

@@ -1,47 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin-base')
 
 @section('title', 'Manajemen Produk')
-
-@section('navbar')
-    @include('layouts.partials.header')
-    <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
-                <i class="fas fa-store me-2"></i>TOKO SAUDARA 2
-            </a>
-
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('dashboard.staff') }}" title="Dashboard Staff">
-                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                </a>
-                <a class="nav-link" href="{{ route('produk.index') }}" title="Kelola Produk">
-                    <i class="fas fa-box me-1"></i>Produk
-                </a>
-                <a class="nav-link" href="{{ route('kategori.index') }}" title="Kelola Kategori">
-                    <i class="fas fa-tags me-1"></i>Kategori
-                </a>
-                <a class="nav-link active" href="{{ route('member.index') }}" title="Kelola Member">
-                    <i class="fas fa-users me-1"></i>Member
-                </a>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" title="Menu Akun">
-                        <i class="fas fa-user-circle me-1"></i>{{ Auth::user()->name }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-edit me-2 text-theme-primary"></i>Profil</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-@endsection
 
 @section('content')
     <div class="content-container">
@@ -281,64 +240,110 @@
             </div>
         @endif
     </div>
+
+    <style>
+        /* Semua style CSS dari file asli ditempatkan di sini */
+        :root {
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 25px 15px;
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary-custom {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            font-weight: 600;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .btn-primary-custom:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+
+        .text-theme-primary {
+            color: var(--color-primary) !important;
+        }
+
+        .bg-theme-light {
+            background-color: var(--color-light) !important;
+        }
+
+        .bg-theme-accent {
+            background-color: var(--color-accent) !important;
+        }
+
+        .product-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 1px solid #e9ecef;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        }
+
+        .card-img-container {
+            overflow: hidden;
+        }
+
+        .card-img-top {
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .btn-group .btn {
+            border-radius: 0.375rem;
+            margin: 0 1px;
+        }
+
+        .pagination .page-link {
+            color: var(--color-primary);
+            border: 1px solid #dee2e6;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--theme-light);
+            border-color: #dee2e6;
+        }
+
+        .bg-success-custom {
+            background-color: var(--color-success) !important;
+            color: white;
+        }
+    </style>
 @endsection
-
-@push('styles')
-<style>
-    .product-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        border: 1px solid #e9ecef;
-    }
-
-    .product-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-    }
-
-    .card-img-container {
-        overflow: hidden;
-    }
-
-    .card-img-top {
-        transition: transform 0.3s ease;
-    }
-
-    .product-card:hover .card-img-top {
-        transform: scale(1.05);
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .btn-group .btn {
-        border-radius: 0.375rem;
-        margin: 0 1px;
-    }
-
-    .pagination .page-link {
-        color: var(--color-primary);
-        border: 1px solid #dee2e6;
-        padding: 0.375rem 0.75rem;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: var(--color-primary);
-        border-color: var(--color-primary);
-        color: white;
-    }
-
-    .pagination .page-link:hover {
-        background-color: var(--theme-light);
-        border-color: #dee2e6;
-    }
-
-    .bg-success-custom {
-        background-color: var(--color-success) !important;
-        color: white;
-    }
-</style>
-@endpush

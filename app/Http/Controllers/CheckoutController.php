@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
@@ -26,7 +28,18 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong');
         }
 
-        $total = $cartItems->sum('subtotal');
+        // Validasi stok untuk setiap item
+        foreach ($cartItems as $item) {
+            if ($item->product->stok < $item->quantity) {
+                return redirect()->route('cart.index')
+                    ->with('error', "Stok {$item->product->nama_produk} tidak mencukupi. Stok tersedia: {$item->product->stok}");
+            }
+        }
+
+        $total = $cartItems->sum(function($item) {
+            return $item->quantity * $item->product->harga_jual;
+        });
+
         $user = Auth::user();
 
         return view('checkout.index', compact('cartItems', 'total', 'user'));
@@ -38,23 +51,29 @@ class CheckoutController extends Controller
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
         }
 
-        // Debug: Log request data
         Log::info('Checkout Request Data:', $request->all());
 
-        // Validasi yang sesuai dengan ENUM di database
-        $validatedData = $request->validate([
-            'nama_lengkap' => 'required|string|max:255',
-            'no_telepon' => 'required|string|max:15',
-            'alamat' => 'required|string',
-            'kota' => 'required|string|max:100',
-            'metode_pengiriman' => 'required|in:reguler,express',
-            'metode_pembayaran' => 'required|in:tunai,debit_kredit,qris_ewallet',
-            'catatan' => 'nullable|string'
-        ]);
-
-        DB::beginTransaction();
-
         try {
+            // Validasi data dasar
+            $validatedData = $request->validate([
+                'nama_lengkap' => 'required|string|max:255',
+                'no_telepon' => 'required|string|max:15',
+                'alamat' => 'required|string',
+                'kota' => 'required|string|max:100',
+                'metode_pengiriman' => 'required|in:reguler,express',
+                'metode_pembayaran' => 'required|in:tunai,transfer,qris',
+                'catatan' => 'nullable|string',
+            ]);
+
+            // Validasi conditional untuk bukti pembayaran
+            if (in_array($request->metode_pembayaran, ['transfer', 'qris'])) {
+                $request->validate([
+                    'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+                ]);
+            }
+
+            DB::beginTransaction();
+
             $user = Auth::user();
             $cartItems = Cart::with('product')->where('user_id', $user->id)->get();
 
@@ -62,45 +81,69 @@ class CheckoutController extends Controller
                 return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong');
             }
 
-            // Hitung total
-            $subtotal = $cartItems->sum('subtotal');
-            $shippingCost = $request->metode_pengiriman == 'express' ? 25000 : 15000;
+            // Validasi stok sebelum proses
+            foreach ($cartItems as $item) {
+                if ($item->product->stok < $item->quantity) {
+                    throw new \Exception("Stok {$item->product->nama_produk} tidak mencukupi. Stok tersedia: {$item->product->stok}");
+                }
+            }
+
+            // Hitung subtotal dengan benar
+            $subtotal = $cartItems->sum(function($item) {
+                return $item->quantity * $item->product->harga_jual;
+            });
+
+            $shippingCost = $this->calculateShippingCost($request->alamat, $request->kota, $request->metode_pengiriman);
             $totalBayar = $subtotal + $shippingCost;
 
-            // Debug: Log sebelum create order
-            Log::info('Creating order with data:', [
-                'user_id' => $user->id,
-                'subtotal' => $subtotal,
-                'total_bayar' => $totalBayar,
-                'metode_pembayaran' => $validatedData['metode_pembayaran'],
-                'tipe_pesanan' => 'website',
-                'status_pesanan' => 'pending'
-            ]);
+            // Generate order number
+            $orderNumber = 'TS-' . date('Ymd') . '-' . strtoupper(Str::random(6));
 
-            // Buat data order
+            // Handle upload bukti pembayaran
+            $buktiPembayaranPath = null;
+            if ($request->hasFile('bukti_pembayaran')) {
+                $buktiPembayaranPath = $request->file('bukti_pembayaran')->store('bukti-pembayaran', 'public');
+
+                // Log untuk debugging
+                Log::info('Bukti pembayaran disimpan di: ' . $buktiPembayaranPath);
+            }
+
+            // Tentukan status berdasarkan metode pembayaran
+            if ($validatedData['metode_pembayaran'] == 'tunai') {
+                $statusPembayaran = Order::STATUS_PEMBAYARAN_MENUNGGU;
+                $statusPesanan = Order::STATUS_PESANAN_MENUNGGU;
+            } else {
+                $statusPembayaran = Order::STATUS_PEMBAYARAN_VERIFIKASI;
+                $statusPesanan = Order::STATUS_PESANAN_VERIFIKASI;
+            }
+
+            // Data order - sesuaikan dengan struktur database
             $orderData = [
                 'user_id' => $user->id,
+                'order_number' => $orderNumber,
                 'subtotal' => $subtotal,
                 'total_diskon' => 0,
+                'shipping_cost' => $shippingCost,
                 'total_bayar' => $totalBayar,
                 'metode_pembayaran' => $validatedData['metode_pembayaran'],
-                'tipe_pesanan' => 'website',
-                'status_pesanan' => 'pending',
+                'bukti_pembayaran' => $buktiPembayaranPath,
+                'status_pembayaran' => $statusPembayaran,
+                'status_pesanan' => $statusPesanan,
                 'nama_lengkap' => $validatedData['nama_lengkap'],
                 'no_telepon' => $validatedData['no_telepon'],
                 'alamat' => $validatedData['alamat'],
                 'kota' => $validatedData['kota'],
                 'metode_pengiriman' => $validatedData['metode_pengiriman'],
                 'catatan' => $validatedData['catatan'] ?? null,
+                'tipe_pesanan' => 'website'
             ];
 
-            // Debug: Log order data
             Log::info('Order Data to be created:', $orderData);
 
             // Buat order
             $order = Order::create($orderData);
 
-            // Buat order items
+            // Buat order items dan update stok
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -109,24 +152,139 @@ class CheckoutController extends Controller
                     'harga_saat_beli' => $item->product->harga_jual,
                     'diskon_item' => 0,
                 ]);
+
+                // Update stok produk dengan validasi
+                $product = $item->product;
+                if ($product->stok < $item->quantity) {
+                    throw new \Exception("Stok {$product->nama_produk} habis selama proses checkout");
+                }
+
+                $product->decrement('stok', $item->quantity);
+
+                // Log update stok
+                Log::info("Stok produk {$product->nama_produk} dikurangi {$item->quantity}. Stok sekarang: {$product->stok}");
             }
 
             // Kosongkan cart
-            Cart::where('user_id', $user->id)->delete();
+            $cartDeleted = Cart::where('user_id', $user->id)->delete();
+            Log::info('Cart items deleted: ' . $cartDeleted);
+
+            // Update profil user jika ada perubahan
+            $this->updateUserProfile($user, $validatedData);
 
             DB::commit();
 
-            Log::info('Order created successfully:', ['order_id' => $order->id]);
+            Log::info('Order created successfully:', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'total' => $order->total_bayar
+            ]);
 
-            return redirect()->route('checkout.success', $order->id)
-                             ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+            // Redirect berdasarkan metode pembayaran
+            if ($validatedData['metode_pembayaran'] == 'tunai') {
+                $message = 'Pesanan berhasil dibuat! Silakan siapkan pembayaran tunai saat barang diterima.';
+            } else {
+                $message = 'Pesanan berhasil dibuat! Pembayaran Anda sedang menunggu verifikasi admin.';
+            }
+
+            return redirect()->route('pelanggan.pesanan.detail', $order->id)
+                             ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
 
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())->withInput();
+            // Hapus bukti pembayaran jika sudah diupload tetapi terjadi error
+            if (isset($buktiPembayaranPath) && Storage::disk('public')->exists($buktiPembayaranPath)) {
+                Storage::disk('public')->delete($buktiPembayaranPath);
+            }
+
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function processPaymentUpload(Request $request, $orderId)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
+        }
+
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        try {
+            $order = Order::where('id', $orderId)
+                        ->where('user_id', Auth::id())
+                        ->firstOrFail();
+
+            if ($order->status_pembayaran !== Order::STATUS_PEMBAYARAN_MENUNGGU) {
+                return back()->with('error', 'Pembayaran tidak dapat diupload untuk status order ini.');
+            }
+
+            // Hapus bukti lama jika ada
+            if ($order->bukti_pembayaran && Storage::disk('public')->exists($order->bukti_pembayaran)) {
+                Storage::disk('public')->delete($order->bukti_pembayaran);
+            }
+
+            // Upload bukti baru
+            $buktiPembayaranPath = $request->file('bukti_pembayaran')->store('bukti-pembayaran', 'public');
+
+            $order->update([
+                'bukti_pembayaran' => $buktiPembayaranPath,
+                'status_pembayaran' => Order::STATUS_PEMBAYARAN_VERIFIKASI,
+                'status_pesanan' => Order::STATUS_PESANAN_VERIFIKASI,
+            ]);
+
+            return redirect()->route('pelanggan.pesanan.detail', $order->id)
+                             ->with('success', 'Bukti pembayaran berhasil diupload! Menunggu verifikasi admin.');
+
+        } catch (\Exception $e) {
+            Log::error('Payment upload error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengupload bukti pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    private function calculateShippingCost($alamat, $kota, $metodePengiriman)
+    {
+        // Cek apakah alamat atau kota mengandung kata "Rumbai" (case insensitive)
+        $isRumbaiArea = stripos($alamat, 'rumbai') !== false || stripos($kota, 'rumbai') !== false;
+
+        if ($isRumbaiArea) {
+            Log::info('Gratis ongkir untuk wilayah Rumbai');
+            return 0; // Gratis ongkir untuk wilayah Rumbai
+        }
+
+        // Ongkir untuk luar Rumbai
+        $cost = $metodePengiriman == 'express' ? 25000 : 15000;
+        Log::info("Ongkir calculated: {$cost} untuk {$metodePengiriman}");
+
+        return $cost;
+    }
+
+    private function updateUserProfile($user, $data)
+    {
+        $updateData = [];
+
+        // Handle perbedaan nama field antara user dan order
+        $userName = $user->nama_lengkap ?? $user->name;
+        $userPhone = $user->no_telepon ?? $user->phone;
+        $userAddress = $user->alamat ?? $user->address;
+
+        if ($userName !== $data['nama_lengkap']) {
+            $updateData['nama_lengkap'] = $data['nama_lengkap'];
+        }
+        if ($userPhone !== $data['no_telepon']) {
+            $updateData['no_telepon'] = $data['no_telepon'];
+        }
+        if ($userAddress !== $data['alamat']) {
+            $updateData['alamat'] = $data['alamat'];
+        }
+
+        if (!empty($updateData)) {
+            $user->update($updateData);
+            Log::info('User profile updated during checkout:', $updateData);
         }
     }
 
@@ -138,5 +296,25 @@ class CheckoutController extends Controller
                      ->firstOrFail();
 
         return view('checkout.success', compact('order'));
+    }
+
+    /**
+     * Method untuk mendapatkan statistik verifikasi (digunakan di dashboard)
+     */
+    public static function getVerificationStats()
+    {
+        return [
+            'menunggu_verifikasi' => Order::where('status_pembayaran', Order::STATUS_PEMBAYARAN_VERIFIKASI)
+                ->where('tipe_pesanan', 'website')
+                ->count(),
+            'terverifikasi_hari_ini' => Order::where('status_pembayaran', Order::STATUS_PEMBAYARAN_TERVERIFIKASI)
+                ->where('tipe_pesanan', 'website')
+                ->whereDate('updated_at', today())
+                ->count(),
+            'total_pesanan_online' => Order::where('tipe_pesanan', 'website')->count(),
+            'pesanan_ditolak' => Order::where('status_pembayaran', Order::STATUS_PEMBAYARAN_DITOLAK)
+                ->where('tipe_pesanan', 'website')
+                ->count(),
+        ];
     }
 }

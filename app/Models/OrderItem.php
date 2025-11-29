@@ -9,7 +9,6 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    // PERBAIKAN: Sesuaikan dengan struktur database order_items
     protected $fillable = [
         'order_id',
         'product_id',
@@ -18,7 +17,22 @@ class OrderItem extends Model
         'diskon_item'
     ];
 
-    // PERBAIKAN: Accessor untuk kompatibilitas
+    protected $casts = [
+        'harga_saat_beli' => 'decimal:2',
+        'diskon_item' => 'decimal:2',
+    ];
+
+    // Accessor untuk kompatibilitas
+    public function getQtyAttribute()
+    {
+        return $this->quantity;
+    }
+
+    public function getHargaAttribute()
+    {
+        return $this->harga_saat_beli;
+    }
+
     public function getJumlahAttribute()
     {
         return $this->quantity;
@@ -32,6 +46,11 @@ class OrderItem extends Model
     public function getSubtotalAttribute()
     {
         return ($this->harga_saat_beli - ($this->diskon_item ?? 0)) * $this->quantity;
+    }
+
+    public function getNamaProdukAttribute()
+    {
+        return $this->product->nama_produk ?? 'Produk';
     }
 
     public function order()

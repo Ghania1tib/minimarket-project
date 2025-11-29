@@ -109,7 +109,7 @@
                                 <span class="fw-bold fs-5" style="color: var(--color-danger); background-color: white; padding: 3px 8px; border-radius: 5px;">Rp {{ number_format(($total ?? 0) + 15000, 0, ',', '.') }}</span>
                             </div>
 
-                            <a href="{{ route('checkout') }}" class="btn btn-accent w-100 btn-lg fw-bold">
+                            <a href="{{ route('checkout.index') }}" class="btn btn-accent w-100 btn-lg fw-bold">
                                 <i class="fas fa-lock me-2"></i> Lanjut ke Pembayaran
                             </a>
 

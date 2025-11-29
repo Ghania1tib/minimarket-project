@@ -14,16 +14,16 @@ class Shift extends Model
 
     protected $fillable = [
         'user_id',
+        'nama_kasir',
         'modal_awal',
-        'total_penjualan_sistem',
+        'status',
+        'waktu_mulai',
+        'waktu_selesai',
         'total_tunai_sistem',
         'total_debit_sistem',
         'total_qris_sistem',
         'uang_fisik_di_kasir',
         'selisih',
-        'waktu_mulai',
-        'waktu_selesai',
-        'status',
         'catatan'
     ];
 

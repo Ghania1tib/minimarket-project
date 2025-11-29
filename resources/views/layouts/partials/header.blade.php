@@ -48,13 +48,13 @@
                         $userRole = Auth::user()->role;
                         $userInitials = strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->name, 0, 2));
 
-                        // Tentukan route dashboard berdasarkan role
+                        // Tentukan route dashboard berdasarkan role - BAGIAN YANG DIPERBAIKI
                         $dashboardRoute = '';
                         $dashboardText = '';
                         $dashboardIcon = 'fas fa-tachometer-alt';
 
-                        if ($userRole === 'pelanggan') {
-                            $dashboardRoute = route('pelanggan.dashboard');
+                        if ($userRole === 'customer' || $userRole === 'pelanggan') {
+                            $dashboardRoute = route('pelanggan.dashboard'); // DIPERBAIKI
                             $dashboardText = 'Dashboard Pelanggan';
                         } elseif ($userRole === 'admin' || $userRole === 'owner') {
                             $dashboardRoute = route('admin.dashboard');
@@ -103,7 +103,7 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
 
-                            <!-- Tombol Dashboard - SELALU TAMPILKAN JIKA ADA ROUTE -->
+                            <!-- Tombol Dashboard - SEKARANG AKAN MUNCUL UNTUK PELANGGAN -->
                             @if(!empty($dashboardRoute))
                                 <li>
                                     <a class="dropdown-item dashboard-item" href="{{ $dashboardRoute }}">
@@ -113,7 +113,7 @@
                                 <li><hr class="dropdown-divider"></li>
                             @endif
 
-                            <!-- Menu berdasarkan role -->
+                            <!-- Menu berdasarkan role - BAGIAN INI AKAN MUNCUL SEKARANG -->
                             @if ($userRole === 'pelanggan')
                                 <li>
                                     <a class="dropdown-item" href="{{ route('pelanggan.profil') }}">
@@ -125,33 +125,12 @@
                                         <i class="fas fa-history me-2"></i>Riwayat Pesanan
                                     </a>
                                 </li>
-                            @elseif ($userRole === 'admin' || $userRole === 'owner')
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('produk.index') }}">
-                                        <i class="fas fa-boxes me-2"></i>Manajemen Produk
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('kategori.index') }}">
-                                        <i class="fas fa-tags me-2"></i>Manajemen Kategori
-                                    </a>
-                                </li>
-                                {{-- <li>
-                                    <a class="dropdown-item" href="{{ route('transaksi.index') }}">
-                                        <i class="fas fa-receipt me-2"></i>Riwayat Transaksi
-                                    </a>
-                                </li> --}}
                             @elseif ($userRole === 'kasir' || $userRole === 'staff')
                                 <li>
                                     <a class="dropdown-item" href="{{ route('pos.new') }}">
                                         <i class="fas fa-barcode me-2"></i>Transaksi POS
                                     </a>
                                 </li>
-                                {{-- <li>
-                                    <a class="dropdown-item" href="{{ route('transaksi.index') }}">
-                                        <i class="fas fa-receipt me-2"></i>Riwayat Transaksi
-                                    </a>
-                                </li> --}}
                             @endif
 
                             <li><hr class="dropdown-divider"></li>
@@ -181,6 +160,7 @@
 </nav>
 
 <style>
+    /* CSS tetap sama seperti sebelumnya */
     .navbar-custom {
         background-color: #E0B1CB;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -377,11 +357,6 @@
         .dropdown-menu {
             min-width: 200px;
         }
-    }
-
-    /* Debug styling untuk memastikan dropdown muncul */
-    .debug-dropdown {
-        border: 2px solid red !important;
     }
 </style>
 

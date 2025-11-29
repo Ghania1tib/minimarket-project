@@ -42,13 +42,6 @@
                     <div class="stats-label text-muted small">Item di Keranjang</div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card p-3 text-center h-100 border-0 shadow-sm">
-                    <div class="text-warning mb-2"><i class="fas fa-star fa-lg"></i></div>
-                    <div class="stats-number fw-bold text-theme-primary fs-5 mb-1">0</div>
-                    <div class="stats-label text-muted small">Poin Reward</div>
-                </div>
-            </div>
         </div>
 
         <div class="row g-3">
@@ -120,7 +113,7 @@
                                                     @php
                                                         $status = $order->status_pesanan ?? 'pending';
                                                         $badgeClass = [
-                                                            'selesai' => 'bg-success-custom',
+                                                            'selesai' => 'bg-success',
                                                             'menunggu_pembayaran' => 'bg-warning text-dark',
                                                             'dibatalkan' => 'bg-danger',
                                                             'diproses' => 'bg-info text-dark',

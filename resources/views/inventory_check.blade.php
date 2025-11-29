@@ -7,23 +7,57 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(to right, #ffdde1, #a1c4fd);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --sidebar-width: 280px;
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--gradient-bg);
+            font-family: var(--font-family);
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            background: var(--gradient-bg);
+            min-height: 100vh;
+        }
+
         .check-card {
             max-width: 800px;
-            margin: 50px auto;
+            margin: 20px auto;
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: none;
         }
+
         .result-box {
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
             border-left: 5px solid #004f7c;
-            display: none; /* Sembunyikan awal */
+            display: none;
         }
+
         .search-results {
             max-height: 300px;
             overflow-y: auto;
@@ -35,66 +69,112 @@
             background: white;
             z-index: 1000;
         }
+
         .search-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
             cursor: pointer;
         }
+
         .search-item:hover {
             background-color: #f8f9fa;
         }
+
         .loading-spinner {
             display: none;
             text-align: center;
             padding: 10px;
         }
+
         .stok-habis {
             color: #dc3545;
         }
+
         .stok-tersedia {
             color: #198754;
         }
+
         .stok-sedikit {
             color: #ffc107;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .navbar-custom .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-left: 0;
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="card check-card">
-        <div class="card-header bg-primary text-white text-center p-3" style="background-color: #004f7c !important; border-radius: 15px 15px 0 0;">
-            <h4 class="mb-0"><i class="fas fa-cubes me-2"></i> CEK HARGA & STOK PRODUK</h4>
-        </div>
-        <div class="card-body p-4">
-            <div class="input-group mb-4">
-                <span class="input-group-text"><i class="fas fa-barcode"></i></span>
-                <input type="text" id="searchInput" class="form-control form-control-lg"
-                       placeholder="Masukkan Barcode / Nama Produk..." autofocus
-                       autocomplete="off">
-                <button class="btn btn-primary" id="searchBtn">
-                    <i class="fas fa-search"></i> Cari
-                </button>
-            </div>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        @if(Auth::user()->role === 'admin' || Auth::user()->role === 'owner')
+            @include('layouts.sidebar-admin')
+        @elseif(Auth::user()->role === 'kasir' || Auth::user()->role === 'staff')
+            @include('layouts.sidebar-kasir')
+        @endif
 
-            <!-- Loading Spinner -->
-            <div class="loading-spinner" id="loadingSpinner">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        <div class="content-wrapper">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-custom">
+                <div class="container-fluid">
+                    <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
+                        <i class="fas fa-store me-2"></i>TOKO SAUDARA 2 - Cek Stok
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <span class="nav-link text-white">
+                            <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
+                        </span>
+                    </div>
                 </div>
-                <p class="mt-2">Mencari produk...</p>
-            </div>
+            </nav>
 
-            <!-- Search Results Dropdown -->
-            <div class="search-results" id="searchResults"></div>
+            <!-- Content -->
+            <div class="card check-card">
+                <div class="card-header bg-primary text-white text-center p-3" style="background-color: #004f7c !important; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0"><i class="fas fa-cubes me-2"></i> CEK HARGA & STOK PRODUK</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="input-group mb-4">
+                        <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                        <input type="text" id="searchInput" class="form-control form-control-lg"
+                               placeholder="Masukkan Barcode / Nama Produk..." autofocus
+                               autocomplete="off">
+                        <button class="btn btn-primary" id="searchBtn">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                    </div>
 
-            <!-- Result Display -->
-            <div class="result-box mt-4" id="resultBox">
-                <!-- Hasil akan ditampilkan di sini oleh JavaScript -->
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Mencari produk...</p>
+                    </div>
+
+                    <!-- Search Results Dropdown -->
+                    <div class="search-results" id="searchResults"></div>
+
+                    <!-- Result Display -->
+                    <div class="result-box mt-4" id="resultBox">
+                        <!-- Hasil akan ditampilkan di sini oleh JavaScript -->
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="card-footer text-center">
-            <a href="{{ route('dashboard.staff') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
-            </a>
         </div>
     </div>
 

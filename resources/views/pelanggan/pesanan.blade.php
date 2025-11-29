@@ -37,7 +37,7 @@
                                 @php
                                     $status = $order->status_pesanan ?? 'pending';
                                     $badgeClass = [
-                                        'selesai' => 'bg-success-custom',
+                                        'selesai' => 'bg-success',
                                         'menunggu_pembayaran' => 'bg-warning text-dark',
                                         'dibatalkan' => 'bg-danger',
                                         'diproses' => 'bg-info text-dark',

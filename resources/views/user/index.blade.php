@@ -1,272 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen User - Minimarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --color-primary: #5E548E;
-            --color-secondary: #9F86C0;
-            --color-accent: #E0B1CB;
-            --color-danger: #E07A5F;
-            --color-success: #70C1B3;
-            --color-light: #F0E6EF;
-            --color-white: #ffffff;
-            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --border-radius-lg: 15px;
-            --border-radius-sm: 8px;
-        }
+@extends('layouts.admin-base')
 
-        body {
-            background: var(--gradient-bg);
-            font-family: var(--font-family);
-            min-height: 100vh;
-        }
+@section('title', 'Manajemen User - Minimarket')
 
-        .navbar {
-            background-color: var(--color-accent);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand,
-        .navbar-nav .nav-link {
-            font-weight: 700;
-            color: var(--color-primary) !important;
-        }
-
-        .card {
-            border-radius: var(--border-radius-lg);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: none;
-            background: var(--color-white);
-        }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
-            border-radius: var(--border-radius-sm);
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-secondary);
-            border-color: var(--color-secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);
-        }
-
-        .btn-success {
-            background-color: var(--color-success);
-            border-color: var(--color-success);
-        }
-
-        .btn-warning {
-            background-color: var(--color-danger);
-            border-color: var(--color-danger);
-        }
-
-        .btn-info {
-            background-color: var(--color-secondary);
-            border-color: var(--color-secondary);
-        }
-
-        .btn-outline-primary {
-            border: 2px solid var(--color-primary);
-            color: var(--color-primary);
-            border-radius: var(--border-radius-sm);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--color-primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .table thead th {
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 15px;
-            font-weight: 600;
-        }
-
-        .table tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(224, 177, 203, 0.1);
-            transform: translateX(5px);
-        }
-
-        .table tbody td {
-            padding: 12px 15px;
-            vertical-align: middle;
-            border-color: #e9ecef;
-        }
-
-        .badge-owner {
-            background-color: var(--color-primary);
-            color: white;
-        }
-
-        .badge-admin {
-            background-color: var(--color-secondary);
-            color: white;
-        }
-
-        .badge-kasir {
-            background-color: var(--color-danger);
-            color: white;
-        }
-
-        .badge-customer {
-            background-color: var(--color-success);
-            color: white;
-        }
-
-        .search-box {
-            border-radius: 25px;
-            border: 2px solid var(--color-accent);
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-        }
-
-        .search-box:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 0.2rem rgba(224, 177, 203, 0.25);
-        }
-
-        .section-title {
-            color: var(--color-primary);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--color-accent);
-            padding-left: 15px;
-        }
-
-        .action-buttons .btn {
-            margin: 2px;
-            border-radius: 6px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: var(--color-accent);
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Pagination Styles */
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .pagination-info {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .pagination {
-            margin: 0;
-        }
-
-        .page-link {
-            color: var(--color-primary);
-            border: 1px solid var(--color-accent);
-            padding: 8px 16px;
-            margin: 0 2px;
-            border-radius: var(--border-radius-sm);
-            transition: all 0.3s ease;
-        }
-
-        .page-link:hover {
-            background-color: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-
-        .page-item.active .page-link {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
-        }
-
-        .page-item.disabled .page-link {
-            color: #6c757d;
-            border-color: #dee2e6;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                <i class="fas fa-users-cog me-2"></i>Manajemen User
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link me-3" href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                </a>
-                <span class="navbar-text me-3">
-                    <i class="fas fa-user me-1"></i>{{ Auth::user()->nama_lengkap }}
-                </span>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm logout-btn">
-                        <i class="fas fa-sign-out-alt me-1"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
+@section('content')
     <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-12">
@@ -568,5 +304,219 @@
             return classes[role] || 'badge-secondary';
         }
     </script>
-</body>
-</html>
+
+    <style>
+        /* Semua style CSS dari file asli ditempatkan di sini */
+        :root {
+            --color-primary: #5E548E;
+            --color-secondary: #9F86C0;
+            --color-accent: #E0B1CB;
+            --color-danger: #E07A5F;
+            --color-success: #70C1B3;
+            --color-light: #F0E6EF;
+            --color-white: #ffffff;
+            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius-lg: 15px;
+            --border-radius-sm: 8px;
+        }
+
+        body {
+            background: var(--gradient-bg);
+            font-family: var(--font-family);
+            min-height: 100vh;
+        }
+
+        .card {
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: none;
+            background: var(--color-white);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+        }
+
+        .btn-warning {
+            background-color: var(--color-danger);
+            border-color: var(--color-danger);
+        }
+
+        .btn-info {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--color-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(224, 177, 203, 0.1);
+            transform: translateX(5px);
+        }
+
+        .table tbody td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+
+        .badge-owner {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .badge-admin {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+
+        .badge-kasir {
+            background-color: var(--color-danger);
+            color: white;
+        }
+
+        .badge-customer {
+            background-color: var(--color-success);
+            color: white;
+        }
+
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid var(--color-accent);
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.2rem rgba(224, 177, 203, 0.25);
+        }
+
+        .section-title {
+            color: var(--color-primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--color-accent);
+            padding-left: 15px;
+        }
+
+        .action-buttons .btn {
+            margin: 2px;
+            border-radius: 6px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--color-accent);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .pagination {
+            margin: 0;
+        }
+
+        .page-link {
+            color: var(--color-primary);
+            border: 1px solid var(--color-accent);
+            padding: 8px 16px;
+            margin: 0 2px;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            border-color: #dee2e6;
+        }
+    </style>
+@endsection

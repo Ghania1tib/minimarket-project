@@ -47,7 +47,6 @@
                                 <div class="row h-100 align-items-center position-relative">
                                     <div class="col-8">
                                         <h5 class="fw-bold mb-1">Gratis Ongkir</h5>
-                                        <p class="small mb-0">Min. belanja Rp 100.000</p>
                                         <p class="small mb-0">Wilayah sekitar Rumbai</p>
                                     </div>
                                     <div class="col-4 text-center">
@@ -65,8 +64,8 @@
 
                                 <div class="row h-100 align-items-center position-relative">
                                     <div class="col-8">
-                                        <h5 class="fw-bold mb-1">Potongan Grosir</h5>
-                                        <p class="small mb-0">Beli dalam jumlah besar</p>
+                                        <h5 class="fw-bold mb-1">Potongan Member</h5>
+                                        <p class="small mb-0">Daftarkan nomor telepon anda!</p>
                                         <p class="small mb-0">Dapatkan diskon spesial</p>
                                     </div>
                                     <div class="col-4 text-center">

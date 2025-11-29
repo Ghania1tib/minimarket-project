@@ -18,21 +18,22 @@ class CashierReportController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        // Ambil parameter tanggal jika ada
+        // Jika admin, redirect ke laporan penjualan admin
+        if (Auth::user()->isAdmin() || Auth::user()->isOwner()) {
+            return $this->adminSalesReport($request);
+        }
+
+        // Kode existing untuk kasir (tetap sama)
         $tanggal = $request->get('tanggal', now()->format('Y-m-d'));
 
-        // Ambil shift aktif user saat ini
         $activeShift = Shift::where('user_id', Auth::id())
             ->where('status', 'active')
             ->first();
 
-        // Hitung total penjualan berdasarkan tanggal
         $salesData = $this->getSalesData($tanggal);
-
-        // Data untuk chart (7 hari terakhir)
         $weeklySales = $this->getWeeklySalesData();
 
-        // Riwayat shift
+        // TAMBAHKAN WITH USER UNTUK MENDAPATKAN NAMA KASIR
         $shiftHistory = Shift::where('user_id', Auth::id())
             ->where('status', 'closed')
             ->orderBy('waktu_selesai', 'desc')
@@ -46,6 +47,138 @@ class CashierReportController extends Controller
             'shiftHistory',
             'tanggal'
         ));
+    }
+
+    /**
+     * Laporan Penjualan untuk Admin
+     */
+    private function adminSalesReport(Request $request)
+    {
+        // Parameter filter
+        $startDate = $request->get('start_date', now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->get('end_date', now()->format('Y-m-d'));
+        $cashierId = $request->get('cashier_id');
+        $paymentMethod = $request->get('payment_method');
+
+        // Data ringkasan penjualan
+        $summaryData = $this->getAdminSummaryData($startDate, $endDate, $cashierId);
+
+        // Data penjualan harian untuk chart
+        $dailySalesData = $this->getDailySalesData($startDate, $endDate, $cashierId);
+
+        // Data metode pembayaran
+        $paymentMethodData = $this->getPaymentMethodData($startDate, $endDate, $cashierId);
+
+        // Data kasir
+        $cashiers = User::whereIn('role', ['kasir', 'admin'])->get();
+
+        // Riwayat shift semua kasir
+        $allShiftHistory = Shift::where('status', 'closed')
+            ->whereBetween('waktu_selesai', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->orderBy('waktu_selesai', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('admin_sales_report', compact(
+            'summaryData',
+            'dailySalesData',
+            'paymentMethodData',
+            'allShiftHistory',
+            'cashiers',
+            'startDate',
+            'endDate',
+            'cashierId',
+            'paymentMethod'
+        ));
+    }
+
+    /**
+     * Data Ringkasan untuk Admin
+     */
+    private function getAdminSummaryData($startDate, $endDate, $cashierId = null)
+    {
+        $query = Order::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->where('status_pesanan', 'selesai');
+
+        if ($cashierId) {
+            $query->where('user_id', $cashierId);
+        }
+
+        return $query->select(
+            DB::raw('COALESCE(SUM(subtotal), 0) as total_penjualan_kotor'),
+            DB::raw('COALESCE(SUM(total_diskon), 0) as total_diskon'),
+            DB::raw('COALESCE(SUM(total_bayar), 0) as total_penjualan_bersih'),
+            DB::raw('COUNT(*) as total_transaksi'),
+            DB::raw('COALESCE(AVG(total_bayar), 0) as rata_rata_transaksi')
+        )->first();
+    }
+
+    /**
+     * Data Penjualan Harian untuk Chart
+     */
+    private function getDailySalesData($startDate, $endDate, $cashierId = null)
+    {
+        $query = Order::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->where('status_pesanan', 'selesai');
+
+        if ($cashierId) {
+            $query->where('user_id', $cashierId);
+        }
+
+        $dailyData = $query->select(
+            DB::raw('DATE(created_at) as tanggal'),
+            DB::raw('COALESCE(SUM(total_bayar), 0) as total_penjualan'),
+            DB::raw('COUNT(*) as total_transaksi')
+        )
+        ->groupBy('tanggal')
+        ->orderBy('tanggal')
+        ->get();
+
+        // Format data untuk chart
+        $labels = [];
+        $sales = [];
+        $transactions = [];
+
+        $currentDate = Carbon::parse($startDate);
+        $endDateObj = Carbon::parse($endDate);
+
+        while ($currentDate <= $endDateObj) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $labels[] = $currentDate->locale('id')->translatedFormat('d M');
+
+            $data = $dailyData->firstWhere('tanggal', $dateStr);
+            $sales[] = $data ? (float) $data->total_penjualan : 0;
+            $transactions[] = $data ? $data->total_transaksi : 0;
+
+            $currentDate->addDay();
+        }
+
+        return [
+            'labels' => $labels,
+            'sales' => $sales,
+            'transactions' => $transactions
+        ];
+    }
+
+    /**
+     * Data Metode Pembayaran
+     */
+    private function getPaymentMethodData($startDate, $endDate, $cashierId = null)
+    {
+        $query = Order::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->where('status_pesanan', 'selesai');
+
+        if ($cashierId) {
+            $query->where('user_id', $cashierId);
+        }
+
+        return $query->select(
+            'metode_pembayaran',
+            DB::raw('COALESCE(SUM(total_bayar), 0) as total'),
+            DB::raw('COUNT(*) as jumlah_transaksi')
+        )
+        ->groupBy('metode_pembayaran')
+        ->get();
     }
 
     private function getSalesData($tanggal)
@@ -199,6 +332,7 @@ class CashierReportController extends Controller
 
         // Validasi manual untuk menghindari issue format angka
         $modalAwal = $request->modal_awal;
+        $namaKasir = $request->nama_kasir; // TAMBAHKAN INI
 
         // Pastikan nilai adalah numerik
         if (!is_numeric($modalAwal)) {
@@ -210,6 +344,14 @@ class CashierReportController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Modal awal minimal Rp 10.000'
+            ], 422);
+        }
+
+        // Validasi nama kasir
+        if (empty($namaKasir)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nama kasir harus diisi'
             ], 422);
         }
 
@@ -226,9 +368,10 @@ class CashierReportController extends Controller
         }
 
         try {
-            // Buat shift baru TANPA timestamps
+            // Buat shift baru
             $shift = new Shift();
             $shift->user_id = Auth::id();
+            $shift->nama_kasir = $namaKasir; // TAMBAHKAN INI
             $shift->modal_awal = $modalAwal;
             $shift->status = 'active';
             $shift->waktu_mulai = now();
@@ -256,7 +399,7 @@ class CashierReportController extends Controller
             return response()->json(['error' => 'Unauthorized access.'], 403);
         }
 
-        $shift = Shift::with('user')->findOrFail($id);
+        $shift = Shift::findOrFail($id);
 
         // Pastikan shift milik user yang bersangkutan atau admin/owner
         if ($shift->user_id !== Auth::id() && !Auth::user()->isAdmin() && !Auth::user()->isOwner()) {
@@ -267,5 +410,39 @@ class CashierReportController extends Controller
             'success' => true,
             'shift' => $shift
         ]);
+    }
+
+    /**
+     * Export Laporan Penjualan untuk Admin (Bonus Feature)
+     */
+    public function exportSalesReport(Request $request)
+    {
+        if (!Auth::check() || (!Auth::user()->isAdmin() && !Auth::user()->isOwner())) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $startDate = $request->get('start_date', now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->get('end_date', now()->format('Y-m-d'));
+        $cashierId = $request->get('cashier_id');
+
+        // Data untuk export
+        $salesData = Order::with('user')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->where('status_pesanan', 'selesai')
+            ->when($cashierId, function($query) use ($cashierId) {
+                return $query->where('user_id', $cashierId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $summaryData = $this->getAdminSummaryData($startDate, $endDate, $cashierId);
+
+        // Return view untuk PDF export (bisa diimplementasikan dengan dompdf)
+        return view('exports.sales_report', compact(
+            'salesData',
+            'summaryData',
+            'startDate',
+            'endDate'
+        ));
     }
 }
