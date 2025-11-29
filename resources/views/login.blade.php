@@ -185,7 +185,9 @@
                 </button>
             </div>
         </form>
-
+            <div class="d-grid mt-3">
+                <a href="{{ route('redirect.google') }}" class="btn btn-theme-primary"> Login with Google </a>
+            </div>
         <p class="text-center signup-link mb-0" style="font-size: 0.85rem;">
             Belum punya akun?
             <a href="{{ route('signup') }}">

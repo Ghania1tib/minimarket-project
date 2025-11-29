@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -86,7 +87,7 @@ class AuthController extends Controller
         }
 
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ], [
             'email.required'    => 'Alamat email wajib diisi.',
@@ -128,5 +129,16 @@ class AuthController extends Controller
             return redirect()->route('pelanggan.dashboard');
         }
         return redirect('/');
+    }
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        $googleUser = Socialite::driver('google')->stateless()->user();
+        $email_user = $googleUser->email;
+        dd($email_user);
     }
 }

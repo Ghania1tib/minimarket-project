@@ -234,3 +234,9 @@ Route::get('/dashboard', function () {
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });
+
+// =======================================================================
+// 8. LARAVEL SOCIALITE ROUTES (GOOGLE AUTH)
+// =======================================================================
+Route::get('/auth/redirect-google', [AuthController::class, 'redirectToGoogle'])->name('redirect.google');
+Route::get('/oauthcallback', [AuthController::class, 'handleGoogleCallback']);
