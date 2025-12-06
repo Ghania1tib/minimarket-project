@@ -169,13 +169,6 @@ public function redirectToGoogle(Request $request)
         $name = $googleUser->name;
         $googleId = $googleUser->getId();
 
-        // Validasi email (opsional: bisa dibatasi domain tertentu)
-        // if (!str_ends_with($email, '@gmail.com')) {
-        //     return redirect('/login')->withErrors([
-        //         'google' => 'Hanya email Gmail yang diperbolehkan.'
-        //     ]);
-        // }
-
         // Cari user berdasarkan email
         $user = User::where('email', $email)->first();
 
