@@ -65,4 +65,14 @@ class User extends Authenticatable
 
         return $roles[$this->role] ?? 'Unknown';
     }
+    public function registeredViaGoogle()
+    {
+        return $this->registered_via === 'google' || !empty($this->google_id);
+    }
+
+    // Scope untuk mencari user by Google ID
+    public function scopeByGoogleId($query, $googleId)
+    {
+        return $query->where('google_id', $googleId);
+    }
 }

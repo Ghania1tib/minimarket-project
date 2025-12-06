@@ -215,7 +215,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // =======================================================================
-// 7. FALLBACK & REDIRECTS
+// 7. LARAVEL SOCIALITE ROUTES (GOOGLE AUTH)
+// =======================================================================
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
+
+// =======================================================================
+// 8. FALLBACK & REDIRECTS
 // =======================================================================
 Route::get('/dashboard', function () {
     $user = Auth::user();
@@ -231,12 +237,8 @@ Route::get('/dashboard', function () {
     return redirect('/');
 })->name('dashboard')->middleware('auth');
 
-Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
-});
+// Route::fallback(function () {
+//     return response()->view('errors.404', [], 404);
+// });
 
-// =======================================================================
-// 8. LARAVEL SOCIALITE ROUTES (GOOGLE AUTH)
-// =======================================================================
-Route::get('/auth/redirect-google', [AuthController::class, 'redirectToGoogle'])->name('redirect.google');
-Route::get('/oauthcallback', [AuthController::class, 'handleGoogleCallback']);
+

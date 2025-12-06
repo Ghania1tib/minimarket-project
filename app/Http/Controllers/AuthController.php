@@ -2,10 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -130,15 +130,122 @@ class AuthController extends Controller
         }
         return redirect('/');
     }
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->redirect();
+
+public function redirectToGoogle(Request $request)
+{
+    try {
+        // Simpan intended URL sebelum redirect ke Google
+        if (!$request->session()->has('url.intended')) {
+            $request->session()->put('url.intended', url()->previous());
+        }
+
+        return Socialite::driver('google')
+            ->with([
+                'prompt' => 'select_account consent', // Force account selection
+                'access_type' => 'online',
+                'include_granted_scopes' => 'true',
+                'login_hint' => '', // Kosongkan agar selalu tampil pilihan
+                'hd' => '*', // Allow any Google domain
+            ])
+            ->scopes(['email', 'profile']) // Scopes yang diperlukan
+            ->stateless()
+            ->redirect();
+
+    } catch (\Exception $e) {
+        \Log::error('Google Redirect Error: ' . $e->getMessage());
+        return redirect('/login')->withErrors([
+            'google' => 'Gagal mengarahkan ke Google. Silakan coba lagi.'
+        ]);
     }
+}
 
     public function handleGoogleCallback()
-    {
+{
+    try {
+        // Dapatkan data user dari Google
         $googleUser = Socialite::driver('google')->stateless()->user();
-        $email_user = $googleUser->email;
-        dd($email_user);
+
+        $email = $googleUser->email;
+        $name = $googleUser->name;
+        $googleId = $googleUser->getId();
+
+        // Validasi email (opsional: bisa dibatasi domain tertentu)
+        // if (!str_ends_with($email, '@gmail.com')) {
+        //     return redirect('/login')->withErrors([
+        //         'google' => 'Hanya email Gmail yang diperbolehkan.'
+        //     ]);
+        // }
+
+        // Cari user berdasarkan email
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            // Jika user belum terdaftar, buat user baru sebagai CUSTOMER
+            $user = User::create([
+                'nama_lengkap' => $name,
+                'email' => $email,
+                'google_id' => $googleId,
+                'password' => Hash::make(uniqid()), // Password acak untuk user Google
+                'role' => 'customer', // Default role sebagai customer
+                'no_telepon' => null, // Bisa diisi nanti
+                'alamat' => null, // Bisa diisi nanti
+                'email_verified_at' => now(), // Email dari Google sudah terverifikasi
+            ]);
+
+            // Log aktivitas pendaftaran
+            \Log::info('New user registered via Google', [
+                'email' => $email,
+                'id' => $user->id
+            ]);
+
+        } else {
+            // Update Google ID jika belum ada
+            if (empty($user->google_id)) {
+                $user->update(['google_id' => $googleId]);
+            }
+
+            // Log aktivitas login
+            \Log::info('User logged in via Google', [
+                'email' => $email,
+                'id' => $user->id
+            ]);
+        }
+
+        // Login user
+        Auth::login($user, true);
+
+        // Regenerate session untuk keamanan
+        request()->session()->regenerate();
+
+        // Redirect ke dashboard berdasarkan role
+        return $this->redirectToDashboard()->with('success', 'Login dengan Google berhasil!');
+
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        // Tangani error dari Google API
+        $response = $e->getResponse();
+        $body = $response->getBody()->getContents();
+        $errorData = json_decode($body, true);
+
+        \Log::error('Google OAuth Error', [
+            'error' => $errorData['error'] ?? 'Unknown',
+            'description' => $errorData['error_description'] ?? 'No description'
+        ]);
+
+        return redirect('/login')->withErrors([
+            'google' => 'Login dengan Google gagal. Silakan coba lagi atau gunakan email/password.'
+        ]);
+
+    } catch (\Exception $e) {
+        // Tangani error umum
+        \Log::error('Google Login Exception', [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+
+        return redirect('/login')->withErrors([
+            'google' => 'Terjadi kesalahan. Silakan coba lagi.'
+        ]);
     }
+}
 }

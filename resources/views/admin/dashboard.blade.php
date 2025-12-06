@@ -170,7 +170,7 @@
         <div class="col-lg-8">
             <div class="card management-card h-100">
                 <div class="card-body">
-                    <h5 class="section-title"><i class="fas fa-database me-2"></i>Quick Action</h5>
+                    <h5 class="section-title"><i class="fas fa-database me-2"></i>Aksi Cepat</h5>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <a href="{{ route('kategori.index') }}" class="quick-action-btn text-center">

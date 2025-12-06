@@ -6,9 +6,17 @@
     <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('pelanggan.dashboard') }}">
-                <i class="fas fa-store me-2"></i>TOKO SAUDARA 2
-            </a>
-
+                 <div class="logo-container" style="display: inline-flex; align-items: center; margin-right: 10px;">
+                <div class="logo" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #5E548E 0%, #9F86C0 100%); display: flex; align-items: center; justify-content: center; color: white; border: 3px solid #9F86C0; box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);">
+                    <img src="{{ asset('storage/logo-toko.png') }}"
+                         alt="Toko Saudara Logo"
+                         height="50"
+                         style="border-radius: 50%;"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzVFMzQ4RSIvPgo8cGF0aCBkPSJNMTggMTVIMjJWMjVIMThWMTVaTTI1IDE1SDI5VjI1SDI1VjE1Wk0xMSAxNUgxNVYyNUgxMVYxNVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg=='">
+                </div>
+            </div>
+            <span class="brand-text" style="color: #5E548E !important; font-weight: 700; font-size: 1.5rem;">TOKO SAUDARA 2</span>
+        </a>
             <div class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('home') }}">
@@ -35,7 +43,7 @@
                             <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                 @csrf
                                 <button type="submit" class="dropdown-item text-danger"><i
-                                        class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                        class="fas fa-sign-out-alt me-2"></i>Keluar</button>
                             </form>
                         </li>
                     </ul>
@@ -44,7 +52,8 @@
         </div>
     </nav>
 @endsection
-
+<br>
+<br>
 @section('content')
     <div class="content-container">
         @yield('content')

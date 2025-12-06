@@ -717,25 +717,50 @@
                     </div>
 
                     <!-- Tambahan untuk Metode QRIS -->
-                    <div class="payment-extra" id="qrisExtra">
-                        <div class="qris-container">
-                            <div class="payment-timer" id="qrisTimer">
-                                <i class="fas fa-clock me-2"></i>Batas Waktu: <span id="timerCountdown">05:00</span>
-                            </div>
-                            <div class="qris-code">
-                                <div class="qris-placeholder">
-                                    QR CODE<br>TOKO SAUDARA 2
-                                </div>
-                            </div>
-                            <p class="text-muted mb-3">Scan QR code di atas untuk pembayaran</p>
-                            <div class="payment-instruction">
-                                <small>
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Gunakan aplikasi e-wallet atau mobile banking untuk scan QRIS
-                                </small>
-                            </div>
-                        </div>
+<div class="payment-extra" id="qrisExtra">
+    <div class="qris-container">
+        <div class="qris-area text-center p-4 bg-light rounded border mb-4">
+            @php
+                // Generate QR dengan data toko dan timestamp
+                $qrContent = "TOKO_SAUDARA_2|QRIS_PAYMENT|" . date('YmdHis');
+            @endphp
+
+            <div class="qrimg-container position-relative d-inline-block">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode($qrContent) }}&format=svg&margin=6&color=198754&bgcolor=ffffff"
+                     alt="QRIS Code"
+                     class="qr-image"
+                     style="width: 180px; height: 180px;">
+
+                <!-- Logo QRIS di tengah -->
+                <div class="qris-logo position-absolute top-50 start-50 translate-middle bg-white rounded-circle p-1"
+                     style="width: 36px; height: 36px;">
+                    <div class="bg-success text-white rounded-circle w-100 h-100 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-qrcode"></i>
                     </div>
+                </div>
+            </div>
+
+            <div class="merchant-info mt-3">
+                <p class="mb-1 fw-bold">TOKO SAUDARA 2</p>
+                <p class="mb-0 text-muted small">Official QRIS Merchant</p>
+            </div>
+        </div>
+
+        <!-- Payment Info Box -->
+        <div class="payment-details bg-white border rounded p-3 mb-3">
+            <div class="row g-2">
+                <div class="col-6">
+                    <small class="text-muted d-block">Merchant ID</small>
+                    <span class="fw-semibold">MID-001234</span>
+                </div>
+                <div class="col-6">
+                    <small class="text-muted d-block">Transaction</small>
+                    <span class="fw-semibold">QRIS Standard</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                     <!-- Input Nominal Bayar -->
                     <div class="mb-3">

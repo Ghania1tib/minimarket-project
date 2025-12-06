@@ -106,27 +106,6 @@
         @endif
 
         <div class="content-wrapper">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <div class="container-fluid">
-                    <a class="navbar-brand fw-bold" href="#">
-                        <i class="fas fa-store me-2"></i>TOKO SAUDARA 2
-                    </a>
-
-                    <div class="navbar-nav ms-auto">
-                        <span class="nav-link">
-                            <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
-                        </span>
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-light btn-sm ms-2">
-                                <i class="fas fa-sign-out-alt me-1"></i>Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </nav>
-
             <!-- Content -->
             <div class="content-container">
                 <div class="d-flex justify-content-between align-items-center mb-4">

@@ -1,7 +1,6 @@
 @extends('layouts.pelanggan')
 
 @section('title', 'Dashboard Saya')
-
 @section('content')
     <div class="container-fluid py-3">
         <div class="welcome-section mb-3" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">

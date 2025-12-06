@@ -66,11 +66,11 @@ class CheckoutController extends Controller
             ]);
 
             // Validasi conditional untuk bukti pembayaran
-            if (in_array($request->metode_pembayaran, ['transfer', 'qris'])) {
-                $request->validate([
-                    'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-                ]);
-            }
+            // if (in_array($request->metode_pembayaran, ['transfer', 'qris'])) {
+            //     $request->validate([
+            //         'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            //     ]);
+            // }
 
             DB::beginTransaction();
 
@@ -113,8 +113,8 @@ class CheckoutController extends Controller
                 $statusPembayaran = Order::STATUS_PEMBAYARAN_MENUNGGU;
                 $statusPesanan = Order::STATUS_PESANAN_MENUNGGU;
             } else {
-                $statusPembayaran = Order::STATUS_PEMBAYARAN_VERIFIKASI;
-                $statusPesanan = Order::STATUS_PESANAN_VERIFIKASI;
+                $statusPembayaran = Order::STATUS_PEMBAYARAN_MENUNGGU;
+                $statusPesanan = Order::STATUS_PESANAN_MENUNGGU;
             }
 
             // Data order - sesuaikan dengan struktur database

@@ -217,13 +217,13 @@ class PesananController extends Controller
             case 'menunggu_pembayaran':
                 return $order->created_at;
             case 'menunggu_verifikasi':
-                return $order->bukti_pembayaran ? $order->updated_at : $order->created_at->addMinutes(10);
+                return $order->bukti_pembayaran ? $order->updated_at : $order->created_at;
             case 'diproses':
-                return $order->created_at->addMinutes(30);
+                return $order->created_at;
             case 'dikirim':
-                return $order->created_at->addHours(2);
+                return $order->created_at;
             case 'selesai':
-                return $order->created_at->addDays(1);
+                return $order->created_at;
             case 'dibatalkan':
                 return $order->updated_at;
             default:

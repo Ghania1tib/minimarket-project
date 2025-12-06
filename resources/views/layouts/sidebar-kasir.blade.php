@@ -102,7 +102,7 @@
             @csrf
             <button type="submit" class="btn btn-logout">
                 <i class="fas fa-sign-out-alt me-2"></i>
-                <span>Logout</span>
+                <span>Keluar</span>
             </button>
         </form>
     </div>

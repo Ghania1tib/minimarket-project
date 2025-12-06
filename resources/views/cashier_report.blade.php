@@ -281,20 +281,6 @@
         @endif
 
         <div class="content-wrapper">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <div class="container-fluid">
-                    <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
-                        <i class="fas fa-store me-2"></i>TOKO SAUDARA 2 - Laporan Kas
-                    </a>
-                    <div class="navbar-nav ms-auto">
-                        <span class="nav-link text-white">
-                            <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
-                        </span>
-                    </div>
-                </div>
-            </nav>
-
             <!-- Content -->
             <div class="report-container">
                 <!-- Header -->
@@ -303,16 +289,6 @@
                         <div class="col-md-8">
                             <h1 class="mb-2"><i class="fas fa-file-invoice-dollar me-3"></i>LAPORAN KAS HARIAN</h1>
                             <p class="mb-0 opacity-75 fs-5">Toko Saudara 2 - Sistem Manajemen Kasir Terintegrasi</p>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <div class="btn-group">
-                                <a href="{{ route('dashboard.staff') }}" class="btn btn-light btn-lg">
-                                    <i class="fas fa-arrow-left me-2"></i> Dashboard
-                                </a>
-                                <button class="btn btn-outline-light btn-lg" onclick="window.print()">
-                                    <i class="fas fa-print me-2"></i> Print
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -130,59 +130,57 @@
                     <i class="fas fa-tachometer-alt me-2"></i> Dashboard Kasir/Staff
                 </h1>
                 <hr class="mt-0 mb-4">
+<!-- Quick Actions -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-theme-light">
+        <h5 class="text-theme-primary fw-bold mb-0" style="font-size: 1.15rem;">
+            <i class="fas fa-bolt me-2"></i> Aksi Cepat
+        </h5>
+    </div>
+    <div class="card-body p-3">
+        <div class="row g-3 justify-content-center">
+            @php
+                $quickActions = [
+                    [
+                        'route' => 'pos.new',
+                        'icon' => 'fas fa-cash-register',
+                        'title' => 'POS Baru',
+                        'color' => 'primary',
+                    ],
+                    [
+                        'route' => 'inventory.check',
+                        'icon' => 'fas fa-search',
+                        'title' => 'Cek Stok Cepat',
+                        'color' => 'secondary',
+                    ],
+                    [
+                        'route' => 'payment.verification.orders.index',
+                        'icon' => 'fas fa-clipboard-list',
+                        'title' => 'Manajemen Pesanan',
+                        'color' => 'info',
+                    ],
+                    [
+                        'route' => 'payment.verification.index',
+                        'icon' => 'fas fa-check-circle',
+                        'title' => 'Verifikasi Pembayaran',
+                        'color' => 'warning',
+                    ],
+                ];
+            @endphp
 
-                <!-- Quick Actions -->
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header bg-theme-light">
-                        <h5 class="text-theme-primary fw-bold mb-0" style="font-size: 1.15rem;">
-                            <i class="fas fa-bolt me-2"></i> Aksi Cepat
-                        </h5>
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="row g-3">
-                            @php
-                                $quickActions = [
-                                    [
-                                        'route' => 'pos.new',
-                                        'icon' => 'fas fa-cash-register',
-                                        'title' => 'POS Baru',
-                                        'color' => 'primary',
-                                    ],
-
-                                    [
-                                        'route' => 'inventory.check',
-                                        'icon' => 'fas fa-search',
-                                        'title' => 'Cek Stok Cepat',
-                                        'color' => 'secondary',
-                                    ],
-                                    [
-                                        'route' => 'payment.verification.orders.index',
-                                        'icon' => 'fas fa-clipboard-list',
-                                        'title' => 'Manajemen Pesanan',
-                                        'color' => 'info',
-                                    ],
-                                    [
-                                        'route' => 'payment.verification.index',
-                                        'icon' => 'fas fa-check-circle',
-                                        'title' => 'Verifikasi Pembayaran',
-                                        'color' => 'warning',
-                                    ],
-                                ];
-                            @endphp
-                            @foreach ($quickActions as $action)
-                                <div class="col-xl-2 col-md-4 col-sm-6">
-                                    <a href="{{ route($action['route']) }}"
-                                        class="btn btn-{{ $action['color'] }} w-100 text-center d-flex flex-column align-items-center py-3"
-                                        style="border-radius: 10px;">
-                                        <i class="{{ $action['icon'] }} fa-2x mb-2"></i>
-                                        <span class="fw-bold" style="font-size: 0.85em;">{{ $action['title'] }}</span>
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+            @foreach ($quickActions as $action)
+                <div class="col-auto">
+                    <a href="{{ route($action['route']) }}"
+                        class="btn btn-{{ $action['color'] }} text-center d-flex flex-column align-items-center py-3 px-4"
+                        style="border-radius: 10px; min-width: 140px;">
+                        <i class="{{ $action['icon'] }} fa-2x mb-2"></i>
+                        <span class="fw-bold" style="font-size: 0.85em;">{{ $action['title'] }}</span>
+                    </a>
                 </div>
-
+            @endforeach
+        </div>
+    </div>
+</div>
                 <!-- Statistics Cards -->
                 <div class="row mb-4 g-3">
                     <div class="col-md-3">

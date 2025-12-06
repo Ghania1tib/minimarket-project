@@ -128,20 +128,6 @@
         @endif
 
         <div class="content-wrapper">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <div class="container-fluid">
-                    <a class="navbar-brand fw-bold" href="{{ route('dashboard.staff') }}">
-                        <i class="fas fa-store me-2"></i>TOKO SAUDARA 2 - Cek Stok
-                    </a>
-                    <div class="navbar-nav ms-auto">
-                        <span class="nav-link text-white">
-                            <i class="fas fa-user me-1"></i>{{ Auth::user()->name }}
-                        </span>
-                    </div>
-                </div>
-            </nav>
-
             <!-- Content -->
             <div class="card check-card">
                 <div class="card-header bg-primary text-white text-center p-3" style="background-color: #004f7c !important; border-radius: 15px 15px 0 0;">

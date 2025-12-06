@@ -58,7 +58,7 @@
                                        placeholder="Cari no. pesanan, nama, telepon..." value="{{ $search }}">
                             </div>
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button type="submit" class="btn btn-primary var w-100">
                                     <i class="fas fa-filter me-1"></i>Terapkan
                                 </button>
                             </div>

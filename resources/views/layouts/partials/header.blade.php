@@ -1,8 +1,17 @@
 <nav class="navbar navbar-expand-lg navbar-light fixed-top navbar-custom">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
-            <i class="fas fa-store me-2"></i>
-            <span class="brand-text">TOKO SAUDARA</span>
+            <!-- Logo container dari login page -->
+            <div class="logo-container" style="display: inline-flex; align-items: center; margin-right: 10px;">
+                <div class="logo" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #5E548E 0%, #9F86C0 100%); display: flex; align-items: center; justify-content: center; color: white; border: 3px solid #9F86C0; box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);">
+                    <img src="{{ asset('storage/logo-toko.png') }}"
+                         alt="Toko Saudara Logo"
+                         height="50"
+                         style="border-radius: 50%;"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzVFMzQ4RSIvPgo8cGF0aCBkPSJNMTggMTVIMjJWMjVIMThWMTVaTTI1IDE1SDI5VjI1SDI1VjE1Wk0xMSAxNUgxNVYyNUgxMVYxNVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg=='">
+                </div>
+            </div>
+            <span class="brand-text" style="color: #5E548E !important; font-weight: 700; font-size: 1.5rem;">TOKO SAUDARA 2</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar"
@@ -11,50 +20,32 @@
         </button>
 
         <div class="collapse navbar-collapse" id="publicNavbar">
-            <!-- Menu Navigasi Utama -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ route('home') }}">
-                        <i class="fas fa-home me-1"></i> Beranda
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}">
-                        <i class="fas fa-box me-1"></i> Semua Produk
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#promo-section">
-                        <i class="fas fa-tags me-1"></i> Promo
-                    </a>
-                </li>
-            </ul>
-
             <!-- Menu Aksi -->
-            <div class="d-flex align-items-center">
-                {{-- Tombol Keranjang --}}
-                <a href="{{ route('cart.index') }}" class="btn btn-cart me-3 position-relative">
+            <div class="d-flex align-items-left ms-auto">
+                {{-- Tombol Keranjang - DIUBAH WARNA --}}
+                <a href="{{ route('cart.index') }}" class="btn btn-cart me-3 position-relative"
+                   style="border-color: #5E548E !important; color: #5E548E !important;">
                     <i class="fas fa-shopping-cart fa-lg"></i>
                     <span class="cart-badge position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                        id="cart-count-badge" style="display: none;">
+                        id="cart-count-badge" style="display: none; background-color: #E07A5F !important;">
                         0
                     </span>
-                    <span class="cart-text ms-1 d-none d-sm-inline">Keranjang</span>
+                    <span class="cart-text ms-1 d-none d-sm-inline"></span>
                 </a>
 
-                {{-- Tombol Akun --}}
+                {{-- Tombol Akun - DIUBAH WARNA BUTTON --}}
                 @auth
                     @php
                         $userRole = Auth::user()->role;
                         $userInitials = strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->name, 0, 2));
 
-                        // Tentukan route dashboard berdasarkan role - BAGIAN YANG DIPERBAIKI
+                        // Tentukan route dashboard berdasarkan role
                         $dashboardRoute = '';
                         $dashboardText = '';
                         $dashboardIcon = 'fas fa-tachometer-alt';
 
                         if ($userRole === 'customer' || $userRole === 'pelanggan') {
-                            $dashboardRoute = route('pelanggan.dashboard'); // DIPERBAIKI
+                            $dashboardRoute = route('pelanggan.dashboard');
                             $dashboardText = 'Dashboard Pelanggan';
                         } elseif ($userRole === 'admin' || $userRole === 'owner') {
                             $dashboardRoute = route('admin.dashboard');
@@ -68,7 +59,8 @@
                     @endphp
                     <div class="dropdown">
                         <button class="btn btn-user dropdown-toggle d-flex align-items-center" type="button"
-                            id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="border-color: #5E548E !important; color: #5E548E !important;">
                             <div class="user-avatar me-2">
                                 {{ $userInitials }}
                             </div>
@@ -103,7 +95,7 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
 
-                            <!-- Tombol Dashboard - SEKARANG AKAN MUNCUL UNTUK PELANGGAN -->
+                            <!-- Tombol Dashboard -->
                             @if(!empty($dashboardRoute))
                                 <li>
                                     <a class="dropdown-item dashboard-item" href="{{ $dashboardRoute }}">
@@ -113,7 +105,7 @@
                                 <li><hr class="dropdown-divider"></li>
                             @endif
 
-                            <!-- Menu berdasarkan role - BAGIAN INI AKAN MUNCUL SEKARANG -->
+                            <!-- Menu berdasarkan role -->
                             @if ($userRole === 'pelanggan')
                                 <li>
                                     <a class="dropdown-item" href="{{ route('pelanggan.profil') }}">
@@ -145,11 +137,14 @@
                         </ul>
                     </div>
                 @else
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm">
+                    {{-- Button Masuk & Daftar - DIUBAH WARNA --}}
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm"
+                           style="background-color: #5E548E !important; border-color: #5E548E !important; color: white !important;">
                             <i class="fas fa-sign-in-alt me-1"></i> Masuk
                         </a>
-                        <a href="{{ route('signup') }}" class="btn btn-primary btn-sm">
+                        <a href="{{ route('signup') }}" class="btn btn-primary btn-sm"
+                           style="background-color: #5E548E !important; border-color: #5E548E !important; color: white !important;">
                             <i class="fas fa-user-plus me-1"></i> Daftar
                         </a>
                     </div>
@@ -160,9 +155,9 @@
 </nav>
 
 <style>
-    /* CSS tetap sama seperti sebelumnya */
+    /* CSS NAVBAR CUSTOM - DIUBAH WARNA BACKGROUND */
     .navbar-custom {
-        background-color: #E0B1CB;
+        background-color: #E0B1CB; /* Tetap menggunakan warna accent */
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         padding: 12px 0;
         transition: all 0.3s ease;
@@ -173,20 +168,22 @@
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
     }
 
+    /* NAVBAR BRAND - DIUBAH WARNA */
     .navbar-brand {
         font-weight: 700;
         font-size: 1.5rem;
-        color: #333 !important;
+        color: #5E548E !important; /* Warna ungu tema */
         display: flex;
         align-items: center;
     }
 
     .brand-text {
-        color: inherit;
+        color: #5E548E !important; /* Warna ungu tema */
     }
 
+    /* NAV LINK - DIUBAH WARNA */
     .nav-link {
-        color: #555 !important;
+        color: #5E548E !important; /* Warna ungu tema */
         font-weight: 500;
         padding: 8px 15px !important;
         border-radius: 8px;
@@ -196,8 +193,8 @@
 
     .nav-link:hover,
     .nav-link.active {
-        color: #007bff !important;
-        background: rgba(0, 123, 255, 0.1);
+        color: #5E548E !important; /* Tetap ungu */
+        background: rgba(94, 84, 142, 0.1); /* Warna ungu dengan opacity */
         transform: translateY(-1px);
     }
 
@@ -220,7 +217,7 @@
     }
 
     .dropdown-item:hover {
-        background-color: #007bff;
+        background-color: #5E548E !important; /* Warna ungu tema */
         color: white !important;
         transform: translateX(3px);
     }
@@ -232,10 +229,11 @@
         margin-bottom: 8px;
     }
 
+    /* BUTTON CART - DIUBAH WARNA */
     .btn-cart {
         background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #333;
+        border: 1px solid rgba(94, 84, 142, 0.3); /* Border ungu */
+        color: #5E548E !important; /* Warna ungu */
         border-radius: 8px;
         padding: 8px 12px;
         transition: all 0.3s ease;
@@ -244,13 +242,14 @@
     }
 
     .btn-cart:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(94, 84, 142, 0.1); /* Background ungu saat hover */
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(94, 84, 142, 0.2); /* Shadow ungu */
+        color: #5E548E !important; /* Tetap ungu */
     }
 
     .cart-badge {
-        background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        background: #E07A5F !important; /* Warna danger tema */
         font-size: 0.65rem;
         padding: 4px 6px;
         min-width: 18px;
@@ -261,10 +260,11 @@
         color: white;
     }
 
+    /* BUTTON USER - DIUBAH WARNA */
     .btn-user {
         background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #333;
+        border: 1px solid rgba(94, 84, 142, 0.3); /* Border ungu */
+        color: #5E548E !important; /* Warna ungu */
         border-radius: 8px;
         padding: 6px 12px;
         transition: all 0.3s ease;
@@ -273,15 +273,16 @@
     }
 
     .btn-user:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(94, 84, 142, 0.1); /* Background ungu saat hover */
         transform: translateY(-2px);
+        color: #5E548E !important; /* Tetap ungu */
     }
 
     .user-avatar {
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: linear-gradient(135deg, #5E548E, #9F86C0); /* Gradient ungu tema */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -296,16 +297,17 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: #5E548E; /* Warna ungu */
     }
 
     .navbar-toggler {
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(94, 84, 142, 0.3); /* Border ungu */
         padding: 4px 8px;
     }
 
-    /* Styling khusus untuk Dashboard Item */
+    /* DASHBOARD ITEM - DIUBAH WARNA */
     .dashboard-item {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #5E548E 0%, #9F86C0 100%) !important; /* Gradient ungu tema */
         color: white !important;
         font-weight: 600;
         margin: 5px 0;
@@ -314,7 +316,7 @@
     }
 
     .dashboard-item:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+        background: linear-gradient(135deg, #4d4579 0%, #8a73ad 100%) !important; /* Gradient ungu lebih gelap */
         color: white !important;
         transform: translateX(3px);
     }
@@ -325,14 +327,20 @@
 
     /* Pastikan item dashboard tidak terpengaruh hover default */
     .dropdown-item.dashboard-item:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+        background: linear-gradient(135deg, #4d4579 0%, #8a73ad 100%) !important;
         color: white !important;
     }
 
     /* Dropdown divider styling */
     .dropdown-divider {
         margin: 8px 0;
-        border-color: rgba(0, 0, 0, 0.1);
+        border-color: rgba(94, 84, 142, 0.1); /* Warna ungu dengan opacity */
+    }
+
+    /* HOVER EFFECT UNTUK DROPDOWN ITEM REGULAR */
+    .dropdown-item:not(.dashboard-item):hover {
+        background-color: #5E548E !important; /* Warna ungu */
+        color: white !important;
     }
 
     @media (max-width: 991.98px) {
@@ -347,6 +355,7 @@
         .nav-link {
             padding: 10px 15px !important;
             margin: 2px 0;
+            color: #5E548E !important; /* Warna ungu untuk mobile */
         }
 
         .btn-cart,
@@ -356,6 +365,16 @@
 
         .dropdown-menu {
             min-width: 200px;
+        }
+
+        /* Untuk logo di mobile */
+        .navbar-brand .logo {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .navbar-brand .logo img {
+            height: 45px !important;
         }
     }
 </style>
