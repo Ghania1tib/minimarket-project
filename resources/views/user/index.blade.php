@@ -43,6 +43,19 @@
                                     <i class="fas fa-search me-2"></i>Cari
                                 </button>
                             </div>
+                            <!-- Reset button jika ada keyword -->
+                            @if (request('search'))
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-search me-1"></i>
+                                        Hasil pencarian untuk: "<strong>{{ request('search') }}</strong>"
+                                    </small>
+                                     <a href="{{ route('user.index') }}?{{ http_build_query(request()->except('search')) }}"
+                                        class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times me-1"></i>Reset pencarian
+                                    </a>
+                                </div>
+                            @endif
                         </form>
                     </div>
                 </div>
@@ -53,7 +66,6 @@
                         <form action="{{ route('user.index') }}" method="GET">
                             <select name="role" class="form-select search-box" onchange="this.form.submit()">
                                 <option value="">Semua Role</option>
-                                <option value="owner" {{ request('role') == 'owner' ? 'selected' : '' }}>Owner</option>
                                 <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                                 <option value="kasir" {{ request('role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
                                 <option value="customer" {{ request('role') == 'customer' ? 'selected' : '' }}>Customer</option>
@@ -182,7 +194,7 @@
                                             </li>
                                         @else
                                             <li class="page-item">
-                                                <a class="page-link" href="{{ $users->previousPageUrl() }}" rel="prev">Previous</a>
+                                                <a class="page-link" href="{{ $users->previousPageUrl() }}" rel="prev">Sebelumnya</a>
                                             </li>
                                         @endif
 
@@ -217,9 +229,6 @@
                                 <i class="fas fa-users-slash"></i>
                                 <h4>Belum Ada User</h4>
                                 <p class="text-muted">Tidak ada data user yang ditemukan.</p>
-                                <a href="{{ route('user.create') }}" class="btn btn-primary mt-3">
-                                    <i class="fas fa-plus-circle me-2"></i>Tambah User Pertama
-                                </a>
                             </div>
                         @endif
                     </div>

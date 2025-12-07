@@ -53,7 +53,6 @@
     </nav>
 @endsection
 <br>
-<br>
 @section('content')
     <div class="content-container">
         @yield('content')

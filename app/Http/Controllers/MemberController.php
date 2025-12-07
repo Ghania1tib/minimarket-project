@@ -1,12 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
@@ -19,10 +17,27 @@ class MemberController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Langkah 4: Cek authentication dan role
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        // Fitur pencarian
+        if (request()->has('keyword')) {
+            $query = Member::withCount('orders');
+
+            if ($request->has('keyword') && ! empty($request->keyword)) {
+                $keyword = $request->keyword;
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('nama_lengkap', 'like', "%{$keyword}%")
+                        ->orWhere('kode_member', 'like', "%{$keyword}%")
+                        ->orWhere('nomor_telepon', 'like', "%{$keyword}%");
+                });
+            }
+
+            $members = $query->orderBy('created_at', 'desc')->get();
+
+            return view('member.index', compact('members'));
+        }
+
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -35,7 +50,7 @@ class MemberController extends Controller
      */
     public function create()
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -48,30 +63,30 @@ class MemberController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
         $request->validate([
-            'kode_member' => 'required|string|max:20|unique:members',
-            'nama_lengkap' => 'required|string|max:100',
-            'nomor_telepon' => 'required|string|max:20|unique:members',
+            'kode_member'    => 'required|string|max:20|unique:members',
+            'nama_lengkap'   => 'required|string|max:100',
+            'nomor_telepon'  => 'required|string|max:20|unique:members',
             'tanggal_daftar' => 'required|date',
         ], [
-            'kode_member.required' => 'Kode member wajib diisi.',
-            'kode_member.unique' => 'Kode member sudah digunakan.',
-            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
-            'nomor_telepon.required' => 'Nomor telepon wajib diisi.',
-            'nomor_telepon.unique' => 'Nomor telepon sudah terdaftar.',
+            'kode_member.required'    => 'Kode member wajib diisi.',
+            'kode_member.unique'      => 'Kode member sudah digunakan.',
+            'nama_lengkap.required'   => 'Nama lengkap wajib diisi.',
+            'nomor_telepon.required'  => 'Nomor telepon wajib diisi.',
+            'nomor_telepon.unique'    => 'Nomor telepon sudah terdaftar.',
             'tanggal_daftar.required' => 'Tanggal daftar wajib diisi.',
         ]);
 
         Member::create([
-            'kode_member' => $request->kode_member,
-            'nama_lengkap' => $request->nama_lengkap,
-            'nomor_telepon' => $request->nomor_telepon,
+            'kode_member'    => $request->kode_member,
+            'nama_lengkap'   => $request->nama_lengkap,
+            'nomor_telepon'  => $request->nomor_telepon,
             'tanggal_daftar' => $request->tanggal_daftar,
-            'poin' => 0,
+            'poin'           => 0,
         ]);
 
         return redirect()->route('member.index')->with('success', 'Member berhasil ditambahkan!');
@@ -82,7 +97,7 @@ class MemberController extends Controller
      */
     public function show($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -95,7 +110,7 @@ class MemberController extends Controller
      */
     public function edit($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -108,30 +123,30 @@ class MemberController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
         $member = Member::findOrFail($id);
 
         $request->validate([
-            'kode_member' => 'required|string|max:20|unique:members,kode_member,' . $id,
-            'nama_lengkap' => 'required|string|max:100',
-            'nomor_telepon' => 'required|string|max:20|unique:members,nomor_telepon,' . $id,
+            'kode_member'    => 'required|string|max:20|unique:members,kode_member,' . $id,
+            'nama_lengkap'   => 'required|string|max:100',
+            'nomor_telepon'  => 'required|string|max:20|unique:members,nomor_telepon,' . $id,
             'tanggal_daftar' => 'required|date',
         ], [
-            'kode_member.required' => 'Kode member wajib diisi.',
-            'kode_member.unique' => 'Kode member sudah digunakan.',
-            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
-            'nomor_telepon.required' => 'Nomor telepon wajib diisi.',
-            'nomor_telepon.unique' => 'Nomor telepon sudah terdaftar.',
+            'kode_member.required'    => 'Kode member wajib diisi.',
+            'kode_member.unique'      => 'Kode member sudah digunakan.',
+            'nama_lengkap.required'   => 'Nama lengkap wajib diisi.',
+            'nomor_telepon.required'  => 'Nomor telepon wajib diisi.',
+            'nomor_telepon.unique'    => 'Nomor telepon sudah terdaftar.',
             'tanggal_daftar.required' => 'Tanggal daftar wajib diisi.',
         ]);
 
         $member->update([
-            'kode_member' => $request->kode_member,
-            'nama_lengkap' => $request->nama_lengkap,
-            'nomor_telepon' => $request->nomor_telepon,
+            'kode_member'    => $request->kode_member,
+            'nama_lengkap'   => $request->nama_lengkap,
+            'nomor_telepon'  => $request->nomor_telepon,
             'tanggal_daftar' => $request->tanggal_daftar,
         ]);
 
@@ -143,7 +158,7 @@ class MemberController extends Controller
      */
     public function destroy($id)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -164,21 +179,21 @@ class MemberController extends Controller
      */
     public function search(Request $request)
     {
-        if (!Auth::check() || (!Auth::user()->isKasir() && !Auth::user()->isOwner() && !Auth::user()->isAdmin())) {
+        if (! Auth::check() || (! Auth::user()->isKasir() && ! Auth::user()->isOwner() && ! Auth::user()->isAdmin())) {
             abort(403, 'Unauthorized access.');
         }
 
         $keyword = $request->input('keyword');
 
-        if (!$keyword) {
+        if (! $keyword) {
             return redirect()->route('member.index');
         }
 
         $members = Member::where('nama_lengkap', 'LIKE', "%{$keyword}%")
-                        ->orWhere('kode_member', 'LIKE', "%{$keyword}%")
-                        ->orWhere('nomor_telepon', 'LIKE', "%{$keyword}%")
-                        ->latest()
-                        ->get();
+            ->orWhere('kode_member', 'LIKE', "%{$keyword}%")
+            ->orWhere('nomor_telepon', 'LIKE', "%{$keyword}%")
+            ->latest()
+            ->get();
 
         return view('member.index', compact('members', 'keyword'));
     }

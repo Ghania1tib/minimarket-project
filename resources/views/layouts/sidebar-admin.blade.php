@@ -33,7 +33,7 @@
                 <a class="nav-link {{ request()->routeIs('kategori.*') ? 'active' : '' }}"
                     href="{{ route('kategori.index') }}">
                     <i class="fas fa-tags me-2"></i>
-                    <span>Kategori Produk</span>
+                    <span>Manajemen Kategori</span>
                 </a>
             </li>
 

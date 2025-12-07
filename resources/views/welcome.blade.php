@@ -40,6 +40,117 @@
         .products-section-compact {
             margin: 1.5rem auto !important;
         }
+
+        /* Button Lihat Selengkapnya */
+        .load-more-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+        }
+
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .load-more-btn:active {
+            transform: translateY(0);
+        }
+
+        .load-more-btn i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .load-more-btn:hover i {
+            transform: translateX(3px);
+        }
+
+        .load-more-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Button Lihat Lebih Sedikit */
+        .show-less-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+        }
+
+        .show-less-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .show-less-btn:active {
+            transform: translateY(0);
+        }
+
+        .show-less-btn i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .show-less-btn:hover i {
+            transform: translateX(-3px);
+        }
+
+        .show-less-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+
+        .button-container {
+            display: flex;
+            justify-content: center !important;
+            align-items: cente !important;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Product Count Info */
+        .product-count-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
     </style>
     <br>
     <!-- Promo Section -->
@@ -49,7 +160,7 @@
                 <!-- Promo Utama -->
                 <div class="col-lg-8">
                     <div class="promo-card p-4 h-100"
-                        style="background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 260px;">
+                        style="background: linear-gradient(135deg, #693d72 0%, #80678b 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 260px;">
                         <!-- Background Pattern -->
                         <div class="position-absolute w-100 h-100"
                             style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
@@ -66,9 +177,17 @@
                                         style="border-radius: 8px;">Mulai Belanja</a>
                                 </div>
                             </div>
-                            <div class="col-md-4 d-none d-md-block">
-                                <div class="text-center">
-                                    <i class="fas fa-store fa-6x" style="opacity: 0.8;"></i>
+                            <div class="col-lg-4 text-center d-none d-lg-block">
+                                <div class="p-3">
+                                    <div class="logo-container"
+                                        style="display: inline-flex; align-items: center; margin-right: 10px;">
+                                        <div class="logo"
+                                            style="width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg, #5E548E 0%, #9F86C0 100%); display: flex; align-items: center; justify-content: center; color: white; border: 3px solid #9F86C0; box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);">
+                                            <img src="{{ asset('storage/logo-toko.png') }}" alt="Toko Saudara Logo"
+                                                height="200" style="border-radius: 50%;"
+                                                onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzVFMzQ4RSIvPgo8cGF0aCBkPSJNMTggMTVIMjJWMjVIMThWMTVaTTI1IDE1SDI5VjI1SDI1VjE1Wk0xMSAxNUgxNVYyNUgxMVYxNVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg=='">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -81,7 +200,7 @@
                         <!-- Gratis Ongkir Card -->
                         <div class="col-12">
                             <div class="promo-card p-3 h-100"
-                                style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 125px;">
+                                style="background: linear-gradient(135deg, #3fae6f 1%, #338357 80%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 125px;">
                                 <!-- Background Pattern -->
                                 <div class="position-absolute w-100 h-100"
                                     style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
@@ -102,7 +221,7 @@
                         <!-- Potongan Grosir Card -->
                         <div class="col-12">
                             <div class="promo-card p-3 h-100"
-                                style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 125px;">
+                                style="background: linear-gradient(135deg, #5980b6 0%, #4457ad 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; min-height: 125px;">
                                 <!-- Background Pattern -->
                                 <div class="position-absolute w-100 h-100"
                                     style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
@@ -132,7 +251,15 @@
                 <div class="col-md-6">
                     <h3 class="mb-0" style="color: var(--color-primary) !important;"><i
                             class="fas fa-shopping-bag me-2"></i> Semua Produk</h3>
-                    <p class="text-muted mb-0">Total {{ $products->total() }} produk tersedia</p>
+                    <p class="text-muted mb-0">
+                        Total
+                        @if (method_exists($products, 'total'))
+                            {{ $products->total() }}
+                        @else
+                            {{ $products->count() }}
+                        @endif
+                        produk tersedia
+                    </p>
                 </div>
                 <div class="col-md-6">
                     <div class="d-flex justify-content-end gap-2 flex-wrap">
@@ -182,9 +309,9 @@
 
                         <!-- Clear Filters -->
                         @if (request('search') || request('category_id'))
-                            <a href="{{ route('home') }}" class="btn btn-outline-secondary"
-                                style="border-radius: 8px; border-color: var(--color-secondary); color: var(--color-secondary); padding: 8px 12px;">
-                                <i class="fas fa-times me-2"></i> Hapus Filter
+                            <a href="{{ route('home') }}" class="btn btn-outline-danger"
+                                style="border-radius: 8px; border-color: var(--color-danger); color: var(--color-danger); padding: 8px 12px;">
+                                <i class="fas fa-times"></i>
                             </a>
                         @endif
                     </div>
@@ -194,7 +321,7 @@
             <!-- Search Results Info -->
             @if (request('search') || request('category_id'))
                 <div class="alert alert-info mb-3"
-                    style="border-radius: 8px; background-color: #e7f3fe; border: 1px solid #b6d4fe; padding: 10px 14px;">
+                    style="border-radius: 8px;border: 1px solid #ff0000; padding: 10px 14px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-info-circle me-2"></i>
@@ -209,14 +336,14 @@
                                 kategori
                                 "<strong>{{ $kategories->where('id', request('category_id'))->first()->nama_kategori ?? '' }}</strong>"
                             @endif
-                            - Ditemukan {{ $products->total() }} produk
+                            - Ditemukan {{ $products->count() }} produk
                         </div>
                     </div>
                 </div>
             @endif
 
             <!-- Products Grid -->
-            <div class="row g-3 mb-4">
+            <div class="row g-3 mb-4" id="products-grid">
                 @if ($products->isEmpty())
                     <div class="col-12 text-center py-5">
                         <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
@@ -230,7 +357,7 @@
                     </div>
                 @else
                     @foreach ($products as $product)
-                        <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="col-lg-3 col-md-4 col-sm-6 product-item">
                             <div class="card product-card h-100 {{ $product->stok <= 0 ? 'out-of-stock' : '' }}"
                                 data-product-id="{{ $product->id }}"
                                 style="border-radius: 10px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06); transition: all 0.3s ease; border: 1px solid #e9ecef; background: white;">
@@ -319,53 +446,28 @@
                 @endif
             </div>
 
-            <!-- Pagination -->
-            @if ($products->hasPages())
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <nav aria-label="Product pagination">
-                            <ul class="pagination justify-content-center">
-                                {{-- Previous Page Link --}}
-                                @if ($products->onFirstPage())
-                                    <li class="page-item disabled">
-                                        <span class="page-link">Previous</span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $products->previousPageUrl() }}"
-                                            rel="prev">Previous</a>
-                                    </li>
-                                @endif
-
-                                {{-- Pagination Elements --}}
-                                @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                                    @if ($page == $products->currentPage())
-                                        <li class="page-item active">
-                                            <span class="page-link">{{ $page }}</span>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                        </li>
-                                    @endif
-                                @endforeach
-
-                                {{-- Next Page Link --}}
-                                @if ($products->hasMorePages())
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $products->nextPageUrl() }}"
-                                            rel="next">Next</a>
-                                    </li>
-                                @else
-                                    <li class="page-item disabled">
-                                        <span class="page-link">Next</span>
-                                    </li>
-                                @endif
-                            </ul>
-                        </nav>
+            <!-- Button Container untuk berbagai aksi -->
+            <div class="row mb-4" id="button-container">
+                <div class="col-12">
+                    <div class="button-container">
+                        @if (method_exists($products, 'hasMorePages') && $products->hasMorePages())
+                            <button class="btn load-more-btn" id="load-more-btn" data-next-page="2"
+                                data-search="{{ request('search') }}" data-category-id="{{ request('category_id') }}">
+                                <i class="fas fa-arrow-down"></i> Lihat Selengkapnya
+                            </button>
+                        @elseif($products->count() > 0 && $products->total() > 12)
+                            <button class="btn show-less-btn" id="show-less-btn">
+                                <i class="fas fa-arrow-up"></i> Lihat Lebih Sedikit
+                            </button>
+                        @elseif($products->count() > 0)
+                            <div class="product-count-info">
+                                <p class="text-muted mb-0">Semua produk telah ditampilkan ({{ $products->count() }}
+                                    produk)</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 @endsection
@@ -399,7 +501,215 @@
                     this.style.boxShadow = 'none';
                 });
             });
+
+            // Load More Button functionality
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    loadMoreProducts(this);
+                });
+            }
+
+            // Show All Button functionality
+            const showAllBtn = document.getElementById('show-all-btn');
+            if (showAllBtn) {
+                showAllBtn.addEventListener('click', function() {
+                    loadAllProducts(this);
+                });
+            }
+
+            // Show Less Button functionality
+            const showLessBtn = document.getElementById('show-less-btn');
+            if (showLessBtn) {
+                showLessBtn.addEventListener('click', function() {
+                    showLessProducts();
+                });
+            }
         });
+
+        // Fungsi untuk load more products dengan AJAX
+        function loadMoreProducts(button) {
+            const nextPage = button.getAttribute('data-next-page');
+            const search = button.getAttribute('data-search');
+            const categoryId = button.getAttribute('data-category-id');
+
+            // Show loading state
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading-spinner"></span> Memuat...';
+            button.classList.add('loading');
+            button.disabled = true;
+
+            // Prepare request parameters
+            const params = new URLSearchParams();
+            params.append('page', nextPage);
+            params.append('ajax', '1'); // Important for AJAX detection
+            if (search && search !== 'null') params.append('search', search);
+            if (categoryId && categoryId !== 'null') params.append('category_id', categoryId);
+
+            // Debug: log URL
+            console.log('Loading products from:', `{{ route('home') }}?${params.toString()}`);
+
+            // Send AJAX request
+            fetch(`{{ route('home') }}?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        // Append new products to grid
+                        if (data.html && data.html.trim() !== '') {
+                            const productsGrid = document.getElementById('products-grid');
+                            productsGrid.insertAdjacentHTML('beforeend', data.html);
+                        }
+
+                        // Update next page or hide button
+                        if (data.hasMorePages) {
+                            button.setAttribute('data-next-page', data.nextPage);
+                            button.innerHTML = originalText;
+                            button.classList.remove('loading');
+                            button.disabled = false;
+
+                            // Update product count info
+                            updateProductCountInfo(data.totalProducts, false);
+                        } else {
+                            // Update to show "Show All" and "Show Less" buttons
+                            updateButtonContainerAfterLoadMore(search, categoryId, data.totalProducts);
+                        }
+
+                        // Reinitialize hover effects for new cards
+                        const newProductCards = document.querySelectorAll('.product-card');
+                        newProductCards.forEach(card => {
+                            card.addEventListener('mouseenter', function() {
+                                this.style.transform = 'translateY(-4px)';
+                                this.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.1)';
+                            });
+                            card.addEventListener('mouseleave', function() {
+                                this.style.transform = 'translateY(0)';
+                                this.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.06)';
+                            });
+                        });
+
+                        // Reinitialize add to cart functionality for new cards
+                        initializeCartFunctionality();
+
+                    } else {
+                        showAlert('Terjadi kesalahan: ' + (data.message || 'Unknown error'), 'error');
+                        button.innerHTML = originalText;
+                        button.classList.remove('loading');
+                        button.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading more products:', error);
+                    showAlert('Terjadi kesalahan saat memuat produk: ' + error.message, 'error');
+                    button.innerHTML = originalText;
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                });
+        }
+
+        // Fungsi untuk reset ke tampilan awal (Lihat Lebih Sedikit)
+        function showLessProducts() {
+            // Reload page to show only initial products
+            window.location.reload();
+        }
+
+        // Fungsi untuk update button container setelah load more
+        function updateButtonContainerAfterLoadMore(search, categoryId, totalProducts) {
+            const buttonContainer = document.getElementById('button-container');
+
+            buttonContainer.innerHTML = `
+                <div class="col-12">
+                        <button class="btn show-less-btn" id="show-less-btn">
+                            <i class="fas fa-arrow-up"></i> Lihat Lebih Sedikit
+                        </button>
+                    </div>
+                    <div class="product-count-info">
+                        <p class="text-muted mb-0">Menampilkan ${totalProducts} produk dari total ${totalProducts}</p>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners to new buttons
+            const newShowAllBtn = document.getElementById('show-all-btn');
+            const newShowLessBtn = document.getElementById('show-less-btn');
+
+            if (newShowAllBtn) {
+                newShowAllBtn.addEventListener('click', function() {
+                    loadAllProducts(this);
+                });
+            }
+
+            if (newShowLessBtn) {
+                newShowLessBtn.addEventListener('click', function() {
+                    showLessProducts();
+                });
+            }
+        }
+
+        // Fungsi untuk update button container setelah load more
+        function updateButtonContainerAfterLoadMore(search, categoryId, totalProducts) {
+            const buttonContainer = document.getElementById('button-container');
+
+            // PERBAIKI: Pastikan struktur HTML benar dengan div.button-container
+            buttonContainer.innerHTML = `
+        <div class="col-12">
+            <div class="button-container">
+                <button class="btn show-less-btn" id="show-less-btn">
+                    <i class="fas fa-arrow-up"></i> Lihat Lebih Sedikit
+                </button>
+            </div>
+            <div class="product-count-info text-center">
+                <p class="text-muted mb-0">Menampilkan ${totalProducts} produk dari total ${totalProducts}</p>
+            </div>
+        </div>
+    `;
+
+            // Add event listener to show less button
+            const showLessBtn = document.getElementById('show-less-btn');
+            if (showLessBtn) {
+                showLessBtn.addEventListener('click', function() {
+                    showLessProducts();
+                });
+            }
+        }
+        // Fungsi untuk update product count info
+        function updateProductCountInfo(totalProducts, isAllProducts = false) {
+            const productCountInfo = document.querySelector('.product-count-info');
+            if (!productCountInfo) {
+                const buttonContainer = document.getElementById('button-container');
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'product-count-info';
+                infoDiv.innerHTML =
+                    `<p class="text-muted mb-0">${isAllProducts ? 'Menampilkan semua' : 'Menampilkan'} ${totalProducts} produk</p>`;
+                buttonContainer.appendChild(infoDiv);
+            } else {
+                productCountInfo.innerHTML =
+                    `<p class="text-muted mb-0">${isAllProducts ? 'Menampilkan semua' : 'Menampilkan'} ${totalProducts} produk</p>`;
+            }
+        }
+
+        // Fungsi untuk update search info dengan jumlah produk yang benar
+        function updateSearchInfo(totalProducts) {
+            const searchInfo = document.querySelector('.alert-info .d-flex div');
+            if (searchInfo) {
+                const text = searchInfo.textContent;
+                // Update jumlah produk dalam info
+                const newText = text.replace(/Ditemukan \d+ produk/, `Ditemukan ${totalProducts} produk`);
+                searchInfo.textContent = newText;
+            }
+        }
 
         // Fungsi untuk menambahkan produk ke keranjang
         function addToCart(productId) {
@@ -675,6 +985,17 @@
 
             .products-section-compact {
                 margin: 0.75rem auto !important;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .button-container button {
+                width: 100%;
+                max-width: 300px;
             }
         }
     </style>

@@ -47,6 +47,7 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             margin-bottom: 20px;
+            color: var(--color-primary)
         }
 
         .card-custom:hover {
@@ -76,6 +77,7 @@
             padding: 25px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             height: 100%;
+            color: var(--color-primary);
         }
 
         .summary-grid {
@@ -170,20 +172,6 @@
         @endif
 
         <div class="content-wrapper">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); border-radius: 10px; margin-bottom: 20px;">
-                <div class="container-fluid">
-                    <a class="navbar-brand fw-bold" href="#">
-                        <i class="fas fa-chart-bar me-2"></i>TOKO SAUDARA 2 - Laporan Penjualan Admin
-                    </a>
-                    <div class="navbar-nav ms-auto">
-                        <span class="navbar-text">
-                            <i class="fas fa-user me-1"></i>{{ Auth::user()->name }} (Admin)
-                        </span>
-                    </div>
-                </div>
-            </nav>
-
             <!-- Content -->
             <div class="admin-report-container">
                 <!-- Header -->
@@ -192,16 +180,6 @@
                         <div class="col-md-8">
                             <h1 class="mb-2"><i class="fas fa-chart-line me-3"></i>LAPORAN PENJUALAN</h1>
                             <p class="mb-0 opacity-75 fs-5">Dashboard Analisis Penjualan Menyeluruh</p>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <div class="btn-group">
-                                <a href="{{ route('admin.dashboard') ?: route('dashboard.staff') }}" class="btn btn-light btn-lg">
-                                    <i class="fas fa-arrow-left me-2"></i> Dashboard
-                                </a>
-                                <button class="btn btn-outline-light btn-lg" onclick="window.print()">
-                                    <i class="fas fa-print me-2"></i> Print
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -270,18 +248,6 @@
                         </h2>
                         <small class="text-muted">Sebelum diskon</small>
                     </div>
-
-                    <div class="stat-card">
-                        <div class="text-warning mb-3">
-                            <i class="fas fa-tag fa-3x"></i>
-                        </div>
-                        <h5 class="text-muted mb-2">TOTAL DISKON</h5>
-                        <h2 class="text-warning mb-0 fw-bold">
-                            Rp {{ number_format($summaryData->total_diskon ?? 0, 0, ',', '.') }}
-                        </h2>
-                        <small class="text-muted">Diskon yang diberikan</small>
-                    </div>
-
                     <div class="stat-card">
                         <div class="text-secondary mb-3">
                             <i class="fas fa-calculator fa-3x"></i>
@@ -298,7 +264,7 @@
                     <!-- Grafik Penjualan -->
                     <div class="col-lg-8">
                         <div class="chart-container">
-                            <h4 class="mb-4 text-primary">
+                            <h4 class="mb-4">
                                 <i class="fas fa-chart-line me-2"></i>Trend Penjualan Harian
                             </h4>
                             <canvas id="salesChart" height="300"></canvas>
@@ -308,60 +274,67 @@
                     <!-- Metode Pembayaran -->
                     <div class="col-lg-4">
                         <div class="chart-container">
-                            <h4 class="mb-4 text-primary">
+                            <h4 class="mb-4">
                                 <i class="fas fa-credit-card me-2"></i>Metode Pembayaran
                             </h4>
                             <canvas id="paymentChart" height="300"></canvas>
                         </div>
                     </div>
                 </div>
+                <br>
 
                 <!-- Riwayat Shift -->
-                <div class="card-custom mt-4">
-                    <div class="card-body">
-                        <h4 class="mb-4 text-primary">
-                            <i class="fas fa-history me-2"></i>Riwayat Shift Terakhir
+                <div class="card-custom">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">
+                            <i class="fas fa-history me-3"></i>Riwayat Shift Terakhir
                         </h4>
                         <div class="table-responsive">
                             <table class="table table-hover table-custom">
                                 <thead>
                                     <tr>
-                                        <th>Kasir</th>
-                                        <th>Waktu</th>
-                                        <th>Modal Awal</th>
-                                        <th>Penjualan Tunai</th>
-                                        <th>Uang Fisik</th>
-                                        <th>Selisih</th>
-                                        <th>Status</th>
+                                        <th><i class="fas fa-user me-2"></i>Kasir</th>
+                                        <th><i class="fas fa-calendar-alt me-2"></i>Waktu</th>
+                                        <th><i class="fas fa-wallet me-2"></i>Modal Awal</th>
+                                        <th><i class="fas fa-cash-register me-2"></i>Penjualan Tunai</th>
+                                        <th><i class="fas fa-money-bill-wave me-2"></i>Uang Fisik</th>
+                                        <th><i class="fas fa-balance-scale me-2"></i>Selisih</th>
+                                        <th><i class="fas fa-check-circle me-2"></i>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($allShiftHistory as $shift)
                                         <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-user me-2 text-muted"></i>
-                                                    {{ $shift->nama_kasir }}
-                                                </div>
+                                            <td class="fw-bold">
+                                                <i class="fas fa-user-circle me-2 text-muted"></i>
+                                                {{ $shift->nama_kasir }}
                                             </td>
                                             <td>{{ $shift->waktu_selesai->format('d/m/Y H:i') }}</td>
-                                            <td>Rp {{ number_format($shift->modal_awal, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($shift->total_tunai_sistem, 0, ',', '.') }}</td>
-                                            <td>Rp {{ number_format($shift->uang_fisik_di_kasir, 0, ',', '.') }}</td>
-                                            <td class="{{ $shift->selisih == 0 ? 'text-success' : 'text-danger' }} fw-bold">
+                                            <td class="fw-bold text-primary">
+                                                Rp {{ number_format($shift->modal_awal, 0, ',', '.') }}
+                                            </td>
+                                            <td class="fw-bold text-success">
+                                                Rp {{ number_format($shift->total_tunai_sistem, 0, ',', '.') }}
+                                            </td>
+                                            <td class="fw-bold text-info">
+                                                Rp {{ number_format($shift->uang_fisik_di_kasir, 0, ',', '.') }}
+                                            </td>
+                                            <td class="fw-bold {{ $shift->selisih == 0 ? 'text-success' : 'text-danger' }}">
                                                 Rp {{ number_format($shift->selisih, 0, ',', '.') }}
                                             </td>
                                             <td>
-                                                <span class="badge {{ $shift->selisih == 0 ? 'bg-success' : 'bg-danger' }}">
+                                                <span class="badge {{ $shift->selisih == 0 ? 'bg-success' : 'bg-danger' }} p-3">
+                                                    <i class="fas fa-{{ $shift->selisih == 0 ? 'check' : 'exclamation' }}-circle me-2"></i>
                                                     {{ $shift->selisih == 0 ? 'COCOK' : 'SELISIH' }}
                                                 </span>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
-                                                <i class="fas fa-inbox fa-2x mb-3"></i>
-                                                <h5>Belum ada riwayat shift</h5>
+                                            <td colspan="7" class="empty-state">
+                                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                                <h5 class="fw-bold">Belum ada riwayat shift</h5>
+                                                <p class="text-muted">Mulai shift pertama untuk melihat riwayat di sini</p>
                                             </td>
                                         </tr>
                                     @endforelse

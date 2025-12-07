@@ -30,11 +30,13 @@
             background: var(--gradient-bg);
             font-family: var(--font-family);
             min-height: 100vh;
+            color: --var(--color-primary);
         }
 
         .main-wrapper {
             display: flex;
             min-height: 100vh;
+            color: var(--color-primary)
         }
 
         .content-wrapper {

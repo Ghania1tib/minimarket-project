@@ -58,7 +58,6 @@ class User extends Authenticatable
     {
         $roles = [
             'owner' => 'Pemilik',
-            'admin' => 'Administrator',
             'kasir' => 'Kasir',
             'customer' => 'Pelanggan'
         ];

@@ -7,20 +7,24 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h3 class="text-primary mb-1" style="color: var(--color-primary) !important;">Selamat
-                                Datang, {{ Auth::user()->nama_lengkap }}!</h3>
-                            <p class="text-muted mb-0">Berikut adalah ringkasan aktivitas dan statistik toko Anda
-                                hari ini.</p>
+                            <h3 class="text-primary mb-2" style="color: var(--color-primary) !important;">
+                                Selamat Datang, {{ Auth::user()->nama_lengkap }}!
+                            </h3>
+                            <p class="text-muted mb-0">
+                                Berikut adalah ringkasan aktivitas dan statistik toko Anda hari ini.
+                            </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <div class="text-muted">
-                                <i class="fas fa-calendar me-2"></i>{{ now()->translatedFormat('l, d F Y') }}
-                            </div>
-                            <div class="text-muted">
-                                <i class="fas fa-clock me-2"></i>{{ now()->format('H:i') }} WIB
+                            <div class="d-flex flex-column align-items-end">
+                                <div class="text-muted mb-1">
+                                    <i class="fas fa-calendar me-2"></i>{{ now()->translatedFormat('l, d F Y') }}
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fas fa-clock me-2"></i>{{ now()->format('H:i') }} WIB
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -30,13 +34,13 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
+    <div class="row mb-4 justify-content-center">
         <!-- Card Menunggu Verifikasi -->
-        <div class="col-xl-2 col-md-4">
+        <div class="col-xl-2 col-md-4 mb-3">
             <div class="card stats-card stats-warning h-100">
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="card-title text-muted mb-2">MENUNGGU VERIFIKASI</h6>
                             <h3 class="mb-1" style="color: #ffc107 !important;">
                                 @php
@@ -51,12 +55,12 @@
                             </h3>
                             <small class="text-muted">Pembayaran Online</small>
                         </div>
-                        <div class="align-self-center">
+                        <div class="align-self-center ms-2">
                             <i class="fas fa-clock fa-2x opacity-25"></i>
                         </div>
                     </div>
                     @if ($pendingVerification > 0)
-                        <div class="mt-2">
+                        <div class="mt-3">
                             <a href="{{ route('payment.verification.index') }}" class="btn btn-warning btn-sm w-100">
                                 <i class="fas fa-check-circle me-1"></i>Verifikasi Sekarang
                             </a>
@@ -65,11 +69,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-2 col-md-4">
+
+        <div class="col-xl-2 col-md-4 mb-3">
             <div class="card stats-card stats-products h-100">
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="card-title text-muted mb-2">TOTAL PRODUK</h6>
                             <h3 class="mb-1" style="color: var(--color-secondary) !important;">
                                 @php
@@ -82,7 +87,7 @@
                             </h3>
                             <small class="text-muted">Produk aktif</small>
                         </div>
-                        <div class="align-self-center">
+                        <div class="align-self-center ms-2">
                             <i class="fas fa-boxes fa-2x opacity-25"></i>
                         </div>
                     </div>
@@ -90,11 +95,11 @@
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-4">
+        <div class="col-xl-2 col-md-4 mb-3">
             <div class="card stats-card stats-lowstock h-100">
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="card-title text-muted mb-2">STOK MENIPIS</h6>
                             <h3 class="mb-1" style="color: var(--color-danger) !important;">
                                 @php
@@ -111,7 +116,7 @@
                             </h3>
                             <small class="text-muted">Perlu restock</small>
                         </div>
-                        <div class="align-self-center">
+                        <div class="align-self-center ms-2">
                             <i class="fas fa-exclamation-triangle fa-2x opacity-25"></i>
                         </div>
                     </div>
@@ -119,11 +124,11 @@
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-4">
+        <div class="col-xl-2 col-md-4 mb-3">
             <div class="card stats-card stats-categories h-100">
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="card-title text-muted mb-2">KATEGORI</h6>
                             <h3 class="text-secondary mb-0 fw-bold">
                                 @php $categoryCount = class_exists('App\Models\Category') ? \App\Models\Category::count() : 5; @endphp
@@ -131,7 +136,7 @@
                             </h3>
                             <small class="text-muted">Kategori produk</small>
                         </div>
-                        <div class="align-self-center">
+                        <div class="align-self-center ms-2">
                             <i class="fas fa-tags fa-2x opacity-25"></i>
                         </div>
                     </div>
@@ -139,11 +144,11 @@
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-4">
+        <div class="col-xl-2 col-md-4 mb-3">
             <div class="card stats-card stats-users h-100">
-                <div class="card-body">
+                <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div class="flex-grow-1">
                             <h6 class="card-title text-muted mb-2">PENGGUNA</h6>
                             <h3 class="mb-1" style="color: #6f42c1 !important;">
                                 @php
@@ -156,7 +161,7 @@
                             </h3>
                             <small class="text-muted">Total pengguna</small>
                         </div>
-                        <div class="align-self-center">
+                        <div class="align-self-center ms-2">
                             <i class="fas fa-users fa-2x opacity-25"></i>
                         </div>
                     </div>
@@ -165,34 +170,38 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- Management Data Master -->
-        <div class="col-lg-8">
+    <!-- Main Content Area -->
+    <div class="row mb-4">
+        <!-- Aksi Cepat -->
+        <div class="col-lg-8 mb-4">
             <div class="card management-card h-100">
-                <div class="card-body">
-                    <h5 class="section-title"><i class="fas fa-database me-2"></i>Aksi Cepat</h5>
-                    <div class="row g-3">
+                <div class="card-body p-4">
+                    <h5 class="section-title mb-4">
+                        <i class="fas fa-database me-2"></i>Aksi Cepat
+                    </h5>
+                    <div class="row g-4">
                         <div class="col-md-4">
-                            <a href="{{ route('kategori.index') }}" class="quick-action-btn text-center">
+                            <a href="{{ route('kategori.index') }}" class="quick-action-btn text-center d-block p-4">
                                 <i class="fas fa-tags fa-3x mb-3 d-block"></i>
-                                <h6>Kategori</h6>
+                                <h6 class="mb-2">Kategori</h6>
                                 <small class="d-block opacity-75">Kelola Kategori</small>
                             </a>
                         </div>
-                        <!-- TAMBAHAN: Payment Verification & Order Management -->
+
                         <div class="col-md-4">
                             <a href="{{ route('payment.verification.orders.index') }}"
-                                class="quick-action-btn text-center position-relative">
+                               class="quick-action-btn text-center d-block p-4 position-relative">
                                 <i class="fas fa-clipboard-list fa-3x mb-3 d-block"></i>
-                                <h6>Manajemen Pesanan</h6>
+                                <h6 class="mb-2">Manajemen Pesanan</h6>
                                 <small class="d-block opacity-75">Kelola Pesanan</small>
                             </a>
                         </div>
+
                         <div class="col-md-4">
                             <a href="{{ route('payment.verification.index') }}"
-                                class="quick-action-btn text-center position-relative">
+                               class="quick-action-btn text-center d-block p-4 position-relative">
                                 <i class="fas fa-check-circle fa-3x mb-3 d-block"></i>
-                                <h6>Verifikasi Pembayaran</h6>
+                                <h6 class="mb-2">Verifikasi Pembayaran</h6>
                                 <small class="d-block opacity-75">Verifikasi Online</small>
                                 @php
                                     $pendingVerification = \App\Models\Order::where(
@@ -203,8 +212,7 @@
                                         ->count();
                                 @endphp
                                 @if ($pendingVerification > 0)
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning py-2 px-3">
                                         {{ $pendingVerification }}
                                     </span>
                                 @endif
@@ -216,45 +224,52 @@
         </div>
 
         <!-- Aktivitas Terbaru -->
-<div class="col-lg-4">
-    <div class="card h-100">
-        <div class="card-body">
-            <h5 class="section-title"><i class="fas fa-history me-2"></i>Aktivitas Terbaru</h5>
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <h5 class="section-title mb-4">
+                        <i class="fas fa-history me-2"></i>Aktivitas Terbaru
+                    </h5>
 
-            @if(isset($recentActivities) && $recentActivities->count() > 0)
-                @foreach($recentActivities as $activity)
-                    <div class="activity-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <strong>{{ $activity['title'] }}</strong>
-                            <small>{{ $activity['time']->format('H:i') }}</small>
+                    @if(isset($recentActivities) && $recentActivities->count() > 0)
+                        <div class="activity-container">
+                            @foreach($recentActivities as $activity)
+                                <div class="activity-item mb-3 pb-3 border-bottom">
+                                    <div class="d-flex w-100 justify-content-between align-items-start mb-1">
+                                        <strong class="text-dark">{{ $activity['title'] }}</strong>
+                                        <small class="text-muted">{{ $activity['time']->format('H:i') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-{{ $activity['color'] }} small">{{ $activity['description'] }}</p>
+                                    <small class="text-muted">
+                                        @if($activity['user'])
+                                            <i class="fas fa-user me-1"></i>{{ $activity['user'] }}
+                                        @else
+                                            <i class="fas fa-robot me-1"></i>Sistem
+                                        @endif
+                                    </small>
+                                </div>
+                            @endforeach
                         </div>
-                        <p class="mb-1 text-{{ $activity['color'] }}">{{ $activity['description'] }}</p>
-                        <small class="text-muted">
-                            @if($activity['user'])
-                                {{ $activity['user'] }}
-                            @else
-                                Sistem
-                            @endif
-                        </small>
-                    </div>
-                @endforeach
-            @else
-                <div class="empty-state">
-                    <i class="fas fa-history"></i>
-                    <p class="mb-0">Belum ada aktivitas terbaru</p>
+                    @else
+                        <div class="empty-state text-center py-5">
+                            <i class="fas fa-history fa-3x mb-3 text-muted opacity-50"></i>
+                            <p class="mb-0 text-muted">Belum ada aktivitas terbaru</p>
+                        </div>
+                    @endif
                 </div>
-            @endif
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Low Stock and Popular Products -->
-    <div class="row mt-4">
+    <div class="row mt-2">
         <!-- Produk Stok Menipis -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="section-title"><i class="fas fa-exclamation-triangle me-2"></i>Produk Stok Menipis</h5>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <h5 class="section-title mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Produk Stok Menipis
+                    </h5>
 
                     @php
                         $lowStockProducts = [];
@@ -273,81 +288,29 @@
                     @if (count($lowStockProducts) > 0)
                         <div class="list-group list-group-flush">
                             @foreach ($lowStockProducts as $product)
-                                <div
-                                    class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-                                    <div>
-                                        <h6 class="mb-1">{{ $product->nama_produk }}</h6>
-                                        <small class="text-muted">Stok: {{ $product->stok }} | Minimal:
-                                            {{ $product->stok_kritis }}</small>
+                                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 text-dark">{{ $product->nama_produk }}</h6>
+                                        <small class="text-muted">
+                                            Stok: <span class="fw-bold">{{ $product->stok }}</span> |
+                                            Minimal: <span class="fw-bold">{{ $product->stok_kritis }}</span>
+                                        </small>
                                     </div>
-                                    <span class="badge bg-danger rounded-pill">{{ $product->stok }}</span>
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">{{ $product->stok }}</span>
                                 </div>
                             @endforeach
                         </div>
-                        <div class="mt-3">
+                        <div class="mt-4">
                             <a href="{{ route('produk.index') }}" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-list me-1"></i>Lihat Semua
                             </a>
                         </div>
                     @else
-                        <div class="empty-state">
-                            <i class="fas fa-check-circle"></i>
-                            <p class="mb-0">Tidak ada produk dengan stok menipis.</p>
+                        <div class="empty-state text-center py-5">
+                            <i class="fas fa-check-circle fa-3x mb-3 text-success opacity-50"></i>
+                            <p class="mb-0 text-muted">Tidak ada produk dengan stok menipis.</p>
                         </div>
                     @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Produk Terpopuler -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="section-title"><i class="fas fa-star me-2"></i>Produk Terpopuler</h5>
-
-                    <div class="row">
-                        @php
-                            $popularProducts = [];
-                            if (class_exists('App\Models\Product')) {
-                                $popularProducts = \App\Models\Product::orderBy('created_at', 'desc')->take(4)->get();
-                            }
-                        @endphp
-
-                        @if (count($popularProducts) > 0)
-                            @foreach ($popularProducts as $product)
-                                <div class="col-md-6 mb-3">
-                                    <div class="card product-card h-100">
-                                        @if (isset($product->gambar_url) && $product->gambar_url)
-                                            <img src="{{ asset('storage/' . $product->gambar_url) }}"
-                                                class="card-img-top" alt="{{ $product->nama_produk }}"
-                                                style="height: 100px; object-fit: cover;">
-                                        @else
-                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                                style="height: 100px;">
-                                                <i class="fas fa-image fa-2x text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title">
-                                                {{ \Illuminate\Support\Str::limit($product->nama_produk ?? 'Produk', 20) }}
-                                            </h6>
-                                            <p class="card-text mb-1 text-success fw-bold">
-                                                Rp {{ number_format($product->harga_jual ?? 0, 0, ',', '.') }}
-                                            </p>
-                                            <small class="text-muted">Stok: {{ $product->stok ?? 0 }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <div class="col-12">
-                                <div class="empty-state">
-                                    <i class="fas fa-box-open"></i>
-                                    <p class="mb-0">Belum ada produk terpopuler</p>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
                 </div>
             </div>
         </div>
@@ -384,7 +347,6 @@
         transition: all 0.3s ease;
         border: none;
         background: var(--color-white);
-        margin-bottom: 20px;
     }
 
     .card:hover {
@@ -517,12 +479,10 @@
 
     .empty-state {
         text-align: center;
-        padding: 2rem;
         color: #6c757d;
     }
 
     .empty-state i {
-        font-size: 3rem;
         margin-bottom: 1rem;
         color: var(--color-accent);
     }
@@ -559,5 +519,55 @@
     .product-card:hover {
         border-color: var(--color-accent);
         box-shadow: 0 5px 15px rgba(224, 177, 203, 0.2);
+    }
+
+    /* Perbaikan layout dan spacing */
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .list-group-item {
+        padding: 1rem 0;
+    }
+
+    .activity-container {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .activity-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .activity-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .activity-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .text-dark {
+        color: #343a40 !important;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid #e9ecef !important;
+    }
+
+    .opacity-50 {
+        opacity: 0.5;
+    }
+
+    .opacity-75 {
+        opacity: 0.75;
     }
 </style>

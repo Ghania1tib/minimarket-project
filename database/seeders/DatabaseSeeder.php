@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             MemberSeeder::class,
-            PromoSeeder::class,
         ]);
 
         $this->command->info('All seeders completed successfully!');

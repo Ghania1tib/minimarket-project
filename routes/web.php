@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 // 1. PUBLIC & AUTH ROUTES
 // =======================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
+Route::get('/load-more-products', [HomeController::class, 'loadMore'])->name('load.more.products');
 // Halaman Statis
 Route::controller(PageController::class)->group(function () {
     Route::get('/about', 'about')->name('about');

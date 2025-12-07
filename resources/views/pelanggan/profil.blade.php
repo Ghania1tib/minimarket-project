@@ -3,7 +3,7 @@
 @section('title', 'Profil Saya')
 
 @section('content')
-<div class="card p-0">
+<div class="card p-0 mx-3 mx-md-4 mx-lg-5">
     <div class="card-header bg-theme-accent">
         <h5 class="card-title mb-0 text-theme-primary fw-bold">
             <i class="fas fa-user-edit me-2"></i>Update Profil

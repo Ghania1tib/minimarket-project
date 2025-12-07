@@ -17,7 +17,7 @@
                 <a class="nav-link {{ request()->routeIs('dashboard.staff') ? 'active' : '' }}"
                     href="{{ route('dashboard.staff') }}">
                     <i class="fas fa-tachometer-alt me-2"></i>
-                    <span>Dashboard Kasir</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
 
@@ -32,7 +32,7 @@
                 <a class="nav-link {{ request()->routeIs('produk.*') ? 'active' : '' }}"
                     href="{{ route('produk.index') }}">
                     <i class="fas fa-box me-2"></i>
-                    <span>Daftar Produk</span>
+                    <span>Manajemen Produk</span>
                 </a>
             </li>
 
@@ -40,7 +40,7 @@
                 <a class="nav-link {{ request()->routeIs('kategori.*') ? 'active' : '' }}"
                     href="{{ route('kategori.index') }}">
                     <i class="fas fa-tags me-2"></i>
-                    <span>Kategori Produk</span>
+                    <span>Manajemen Kategori</span>
                 </a>
             </li>
 
@@ -48,7 +48,7 @@
                 <a class="nav-link {{ request()->routeIs('member.*') ? 'active' : '' }}"
                     href="{{ route('member.index') }}">
                     <i class="fas fa-users me-2"></i>
-                    <span>Member</span>
+                    <span>Manajemen Member</span>
                 </a>
             </li>
 
@@ -56,7 +56,7 @@
                 <a class="nav-link {{ request()->routeIs('payment.verification.orders.*') ? 'active' : '' }}"
                     href="{{ route('payment.verification.orders.index') }}">
                     <i class="fas fa-clipboard-list me-2"></i>
-                    <span>Daftar Pesanan</span>
+                    <span>Manajemen Pesanan</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -79,7 +79,7 @@
                 <a class="nav-link {{ request()->routeIs('cashier.report') ? 'active' : '' }}"
                     href="{{ route('cashier.report') }}">
                     <i class="fas fa-chart-bar me-2"></i>
-                    <span>Laporan Harian</span>
+                    <span>Laporan Penjualan</span>
                 </a>
             </li>
 

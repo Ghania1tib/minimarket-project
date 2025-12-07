@@ -106,30 +106,15 @@
                         <i class="fas fa-cash-register me-2"></i>Dashboard <strong>KASIR</strong>
                     </a>
                     <div class="navbar-nav ms-auto d-flex align-items-center">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('home') }}">
-                                <i class="fas fa-home me-1"></i> Beranda
-                            </a>
-                        </li>
                         <span class="nav-link text-theme-primary me-3 d-none d-md-block small">
                             Halo, <strong>{{ Auth::user()->nama_lengkap }} ({{ Auth::user()->role }})</strong>
                         </span>
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fas fa-sign-out-alt"></i> Keluar
-                            </button>
-                        </form>
                     </div>
                 </div>
             </nav>
 
             <!-- Content -->
             <div class="content-container">
-                <h1 class="mb-3 text-theme-primary" style="font-size: 1.75rem;">
-                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard Kasir/Staff
-                </h1>
-                <hr class="mt-0 mb-4">
 <!-- Quick Actions -->
 <div class="card mb-4 shadow-sm">
     <div class="card-header bg-theme-light">

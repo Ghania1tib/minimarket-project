@@ -3,113 +3,366 @@
 @section('title', 'Manajemen Kategori')
 
 @section('content')
-    <div class="content-container">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="text-theme-primary" style="font-size: 1.75rem;"><i class="fas fa-tags me-2"></i> Manajemen Kategori</h1>
-            <a href="{{ route('kategori.create') }}" class="btn btn-primary-custom btn-md">
-                <i class="fas fa-plus me-2"></i>Tambah Kategori
-            </a>
-        </div>
-        <hr class="mt-0 mb-4">
-
-        <div class="row g-3">
-            @if(isset($kategories) && $kategories->isEmpty())
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-tags fa-4x text-secondary mb-3"></i>
-                    <h4>Belum ada kategori</h4>
-                    <p class="text-muted">Mulai dengan menambahkan kategori pertama Anda.</p>
-                    <a href="{{ route('kategori.create') }}" class="btn btn-primary-custom mt-2">
-                        <i class="fas fa-plus me-2"></i>Tambah Kategori Pertama
-                    </a>
-                </div>
-            @else
-                @foreach($kategories as $kategori)
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card h-100 p-3 text-center bg-theme-light shadow-sm" style="border-top: 4px solid var(--color-accent);">
-                            <div class="card-body p-3">
-                                <div class="mb-3">
-                                    {{-- Icon/Image Display --}}
-                                    @if ($kategori->icon_url && filter_var($kategori->icon_url, FILTER_VALIDATE_URL))
-                                        <img src="{{ $kategori->icon_url }}" alt="{{ $kategori->nama_kategori }}" class="rounded-3" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid var(--color-primary);">
-                                    @elseif(isset($kategori->icon_url))
-                                        <img src="{{ asset('storage/' . $kategori->icon_url) }}" alt="{{ $kategori->nama_kategori }}" class="rounded-3" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid var(--color-primary);">
-                                    @else
-                                        <i class="fas fa-layer-group fa-2x text-theme-primary"></i>
-                                    @endif
-                                </div>
-                                <h6 class="card-title text-theme-primary fw-bold">{{ $kategori->nama_kategori }}</h6>
-                                <p class="card-text text-muted small">
-                                    {{ $kategori->products_count ?? 0 }} produk
-                                </p>
-
-                                <div class="btn-group w-100 mt-3">
-                                    <a href="{{ route('kategori.edit', $kategori->id) }}" class="btn btn-primary-custom btn-sm">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Hapus kategori {{ $kategori->nama_kategori }}?')">
-                                            <i class="fas fa-trash"></i> Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h2 class="section-title mb-0">
+                                <i class="fas fa-tags me-2"></i>Manajemen Kategori
+                            </h2>
+                            <p class="text-muted mb-0">Kelola kategori produk toko</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{{ route('kategori.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Tambah Kategori Baru
+                            </a>
                         </div>
                     </div>
-                @endforeach
-            @endif
+                </div>
+            </div>
         </div>
     </div>
 
-    <style>
-        /* Semua style CSS dari file asli ditempatkan di sini */
-        :root {
-            --color-primary: #5E548E;
-            --color-secondary: #9F86C0;
-            --color-accent: #E0B1CB;
-            --color-danger: #E07A5F;
-            --color-success: #70C1B3;
-            --color-light: #F0E6EF;
-            --color-white: #ffffff;
-            --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --border-radius-lg: 15px;
-            --border-radius-sm: 8px;
-        }
+    <!-- Kategori Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
-        .content-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 25px 15px;
-            background-color: var(--color-white);
-            border-radius: var(--border-radius-lg);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
-        .btn-primary-custom {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
-            font-weight: 600;
-            border-radius: var(--border-radius-sm);
-        }
+                    @if($kategories->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama Kategori</th>
+                                        <th>Jumlah Produk</th>
+                                        <th>Tanggal Dibuat</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($kategories as $kategori)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="category-avatar me-3">
+                                                        <i class="fas fa-layer-group"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong class="text-primary">{{ $kategori->nama_kategori }}</strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-category rounded-pill p-2">
+                                                    <i class="fas fa-box me-1"></i>{{ $kategori->products_count ?? 0 }} produk
+                                                </span>
+                                            </td>
+                                            <td>{{ $kategori->created_at->format('d/m/Y') }}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{{ route('kategori.show', $kategori->id) }}"
+                                                       class="btn btn-info btn-sm"
+                                                       data-bs-toggle="tooltip"
+                                                       title="Detail Kategori">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('kategori.edit', $kategori->id) }}"
+                                                       class="btn btn-warning btn-sm"
+                                                       data-bs-toggle="tooltip"
+                                                       title="Edit Kategori">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route('kategori.destroy', $kategori->id) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori {{ $kategori->nama_kategori }}?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                                class="btn btn-danger btn-sm"
+                                                                data-bs-toggle="tooltip"
+                                                                title="Hapus Kategori">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
-        .btn-primary-custom:hover {
-            background-color: var(--color-secondary);
-            border-color: var(--color-secondary);
-        }
+                        <!-- Info Jumlah Kategori -->
+                        <div class="pagination-container mt-3">
+                            <div class="pagination-info">
+                                Total: {{ $kategories->count() }} kategori
+                            </div>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <i class="fas fa-tags fa-4x"></i>
+                            <h4>Belum Ada Kategori</h4>
+                            <p class="text-muted">Tidak ada data kategori yang ditemukan.</p>
+                            <a href="{{ route('kategori.create') }}" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus-circle me-2"></i>Tambah Kategori Pertama
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        .text-theme-primary {
-            color: var(--color-primary) !important;
-        }
+<style>
+/* Variabel CSS konsisten */
+:root {
+    --color-primary: #5E548E;
+    --color-secondary: #9F86C0;
+    --color-accent: #E0B1CB;
+    --color-danger: #E07A5F;
+    --color-success: #70C1B3;
+    --color-warning: #FFB347;
+    --color-info: #5BC0DE;
+    --color-light: #F0E6EF;
+    --color-white: #ffffff;
+    --gradient-bg: linear-gradient(135deg, #F0E6EF 0%, #D891EF 100%);
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --border-radius-lg: 15px;
+    --border-radius-sm: 8px;
+}
 
-        .bg-theme-light {
-            background-color: var(--color-light) !important;
-        }
+body {
+    background: var(--gradient-bg);
+    font-family: var(--font-family);
+    min-height: 100vh;
+}
 
-        .bg-theme-accent {
-            background-color: var(--color-accent) !important;
-        }
-    </style>
+.card {
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: none;
+    background: var(--color-white);
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    border-radius: var(--border-radius-sm);
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(94, 84, 142, 0.3);
+}
+
+.btn-warning {
+    background-color: var(--color-warning);
+    border-color: var(--color-warning);
+    color: #000;
+}
+
+.btn-info {
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 15px;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(224, 177, 203, 0.1);
+    transform: translateX(5px);
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+/* Badge Styles */
+.badge-category {
+    background-color: var(--color-accent);
+    color: #5E548E;
+}
+
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rounded-pill {
+    border-radius: 50px !important;
+}
+
+/* Section Title */
+.section-title {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 15px;
+}
+
+/* Category Avatar */
+.category-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-secondary) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.action-buttons .btn {
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--color-accent);
+}
+
+.empty-state h4 {
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: var(--border-radius-sm);
+    border: none;
+}
+
+.alert-success {
+    background-color: rgba(112, 193, 179, 0.1);
+    border-left: 4px solid var(--color-success);
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: rgba(224, 122, 95, 0.1);
+    border-left: 4px solid var(--color-danger);
+    color: #721c24;
+}
+
+/* Pagination Info */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
 @endsection
